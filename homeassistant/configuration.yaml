@@ -1,0 +1,13 @@
+# Config base — Home Assistant genera el resto en .storage/ (fuera de git)
+default_config:
+
+homeassistant:
+  name: Depto
+  time_zone: America/Argentina/Buenos_Aires
+  unit_system: metric
+  currency: ARS
+  country: AR
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
