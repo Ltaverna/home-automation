@@ -1,6 +1,13 @@
 # Config base — Home Assistant genera el resto en .storage/ (fuera de git)
 default_config:
 
+# tailscale serve (reverse proxy local) → HTTPS en https://r2130.tail71f19f.ts.net
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - ::1
+
 homeassistant:
   name: Depto
   time_zone: America/Argentina/Buenos_Aires
