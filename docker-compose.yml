@@ -19,9 +19,13 @@ services:
     container_name: homeassistant
     restart: unless-stopped
     network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     volumes:
       - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
     environment:
       - TZ=${TZ}
     depends_on:
