@@ -18,6 +18,18 @@ homeassistant:
 # WoL para encender las TVs (LG 38:06:E6:1C:26:70, Samsung 68:72:C3:80:C4:A8)
 wake_on_lan:
 
+# Estados globales de la casa (spec §house modes). CINEMA es escena, no estado.
+# CLEANING se automatiza en Fase 2+ (necesita sensor de puerta + schedule + mmWave).
+input_select:
+  house_mode:
+    name: Modo de la casa
+    options:
+      - HOME
+      - AWAY
+      - CLEANING
+      - NIGHT
+    icon: mdi:home-account
+
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml

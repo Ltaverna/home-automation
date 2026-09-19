@@ -6,3 +6,105 @@
       entity_id: media_player.lg_webos_tv_oled55c3psa
   actions:
     - action: script.tv_living_encender
+
+- id: house_mode_llegada
+  alias: "House mode: llegada"
+  description: >
+    Geofence del iPhone pasa a home → HOME. En Fase 2 se suma la confirmación
+    por sensor de puerta (spec: puerta abierta recientemente).
+  triggers:
+    - trigger: state
+      entity_id: person.lucas
+      to: "home"
+  conditions:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: input_select.house_mode
+          state: "HOME"
+  actions:
+    - action: input_select.select_option
+      target:
+        entity_id: input_select.house_mode
+      data:
+        option: "HOME"
+    - action: notify.mobile_app_lucass_iphone
+      data:
+        title: "🏠 Bienvenido"
+        message: "Modo HOME activado."
+
+- id: house_mode_salida
+  alias: "House mode: salida"
+  description: >
+    iPhone not_home sostenido 5 min → AWAY (anti-flapping de geofence, spec:
+    no apagar todo ante un único cambio). Apaga ambas TVs. En Fase 2 se suma
+    la condición human_present=false (mmWave) y el respeto del modo CLEANING.
+  triggers:
+    - trigger: state
+      entity_id: person.lucas
+      to: "not_home"
+      for: "00:05:00"
+  conditions:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: input_select.house_mode
+          state: "CLEANING"
+  actions:
+    - action: input_select.select_option
+      target:
+        entity_id: input_select.house_mode
+      data:
+        option: "AWAY"
+    - action: media_player.turn_off
+      target:
+        entity_id:
+          - media_player.lg_webos_tv_oled55c3psa
+          - media_player.lucass_tv_60ta
+      continue_on_error: true
+    - action: notify.mobile_app_lucass_iphone
+      data:
+        title: "🚪 Casa vacía"
+        message: "Modo AWAY: TVs apagadas."
+
+- id: house_mode_noche
+  alias: "House mode: noche (provisional)"
+  description: >
+    Provisional por horario: 23:30 estando en casa → NIGHT. En Fase 2 el trigger
+    real es presencia en dormitorio + living vacío (mmWave).
+  triggers:
+    - trigger: time
+      at: "23:30:00"
+  conditions:
+    - condition: state
+      entity_id: person.lucas
+      state: "home"
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "HOME"
+  actions:
+    - action: input_select.select_option
+      target:
+        entity_id: input_select.house_mode
+      data:
+        option: "NIGHT"
+
+- id: house_mode_manana
+  alias: "House mode: mañana"
+  description: "Salir de NIGHT a las 07:00 si hay alguien en casa."
+  triggers:
+    - trigger: time
+      at: "07:00:00"
+  conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "NIGHT"
+    - condition: state
+      entity_id: person.lucas
+      state: "home"
+  actions:
+    - action: input_select.select_option
+      target:
+        entity_id: input_select.house_mode
+      data:
+        option: "HOME"
