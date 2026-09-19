@@ -7,7 +7,7 @@
 ## Contexto
 
 Departamento, un solo ocupante (Lucas) + perro + limpieza periódica (martes).
-Hardware existente: **Seeed reComputer AI R2130** (Raspberry Pi 5 8GB + Hailo-8 26 TOPS + SSD), mini-PC disponible pero **no se usa** (queda de respaldo). TV LG OLED55C5PSA, amplificador NAD D3020 V2 (LG→NAD por óptico), aire acondicionado split común **sin WiFi** (solo IR), cerradura Philips DDL615-5HBS (autónoma, sin integración). Teléfono: iPhone.
+Hardware existente: **Seeed reComputer AI R2130** (Raspberry Pi 5 8GB + Hailo-8 26 TOPS + SSD), mini-PC disponible pero **no se usa** (queda de respaldo). TV LG OLED55C3PSA (el doc v4 decía C5; el modelo real detectado por HA es C3 — misma integración webOS), amplificador NAD D3020 V2 (LG→NAD por óptico), aire acondicionado split común **sin WiFi** (solo IR), cerradura Philips DDL615-5HBS (autónoma, sin integración). Teléfono: iPhone.
 
 Filosofía (heredada del doc v4, se mantiene): local-first, simple, confiable, usable manualmente aunque HA falle. Regla de diseño por dispositivo: API local → Zigbee/Matter → ESPHome → IR/RF → cloud como último recurso.
 
@@ -27,7 +27,7 @@ Filosofía (heredada del doc v4, se mantiene): local-first, simple, confiable, u
                          │
         ┌────────────────┼──────────────────┐
         │                │                  │
-  reComputer R2130   SLZB-06M          LG OLED C5 (LAN/webOS)
+  reComputer R2130   SLZB-06M          LG OLED C3 (LAN/webOS)
   (Pi OS + Docker)   (Zigbee/Ethernet)      │ optical
         │                │                  ▼
         │            puerta, mmWave,   NAD D3020 V2
