@@ -70,6 +70,36 @@ flow_canal:
         entity_id: media_player.lg_webos_tv_oled55c3psa
         button: "ENTER"
 
+flow_canal_dormitorio:
+  alias: "Flow: poner canal (dormitorio)"
+  icon: mdi:television-guide
+  description: >
+    Manda los dígitos + ENTER al Samsung por remote.send_command. Requiere que
+    la app Flow ya esté abierta reproduciendo TV en vivo (el samsungtv nativo
+    no puede lanzar apps en modelos 2020+; ver pendientes: ha-samsungtv-smart).
+  fields:
+    canal:
+      name: Canal
+      description: "Número de canal de Flow (ej. 24)"
+      required: true
+      example: 24
+  sequence:
+    - repeat:
+        for_each: "{{ canal | string | trim | list }}"
+        sequence:
+          - action: remote.send_command
+            target:
+              entity_id: remote.lucass_tv_60ta
+            data:
+              command: "KEY_{{ repeat.item }}"
+          - delay:
+              milliseconds: 400
+    - action: remote.send_command
+      target:
+        entity_id: remote.lucass_tv_60ta
+      data:
+        command: "KEY_ENTER"
+
 tv_app:
   alias: "TV living: abrir app"
   icon: mdi:apps

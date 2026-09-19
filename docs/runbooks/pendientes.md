@@ -4,6 +4,10 @@
   Samsung Q60T dormitorio integrada (`media_player.lucass_tv_60ta`, 192.168.1.16,
   MAC 68:72:C3:80:C4:A8 para WoL). Sony HT-G700: sin red, se controla indirecto por
   HDMI-CEC a través del Samsung. Reservar también la IP de la Samsung en el router.
+- Samsung Q60T: la integración nativa no lanza apps en modelos 2020+ (endpoint REST removido).
+  Si se quiere "poné Netflix" en el dormitorio: integración HACS ollo69/ha-samsungtv-smart
+  (apps vía SmartThings). Zapping de canales ya resuelto con remote.send_command KEY_*.
+- Cargar grilla Flow nombre→número en script.flow_canal (dictada por Lucas desde la guía).
 - Probar encendido remoto de ambas TVs con las TVs apagadas (LG: Quick Start+ activado;
   Samsung: WoL). Si el LG no enciende, fallback wake_on_lan documentado en el plan Fase 1.
 
