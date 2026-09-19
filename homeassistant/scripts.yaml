@@ -13,3 +13,42 @@ tv_dormitorio_encender:
     - action: wake_on_lan.send_magic_packet
       data:
         mac: "68:72:C3:80:C4:A8"
+
+flow_canal:
+  alias: "Flow: poner canal (living)"
+  icon: mdi:television-guide
+  description: >
+    Abre Flow si no está activo y zapea al canal indicado mandando los dígitos
+    + ENTER. Los dígitos solo actúan si Flow está reproduciendo TV en vivo
+    (no en el menú de la app).
+  fields:
+    canal:
+      name: Canal
+      description: "Número de canal de Flow (ej. 24)"
+      required: true
+      example: 24
+  sequence:
+    - if:
+        - condition: template
+          value_template: >
+            {{ state_attr('media_player.lg_webos_tv_oled55c3psa', 'source') != 'Flow' }}
+      then:
+        - action: media_player.select_source
+          target:
+            entity_id: media_player.lg_webos_tv_oled55c3psa
+          data:
+            source: "Flow"
+        - delay: "00:00:12"
+    - repeat:
+        for_each: "{{ canal | string | list }}"
+        sequence:
+          - action: webostv.button
+            data:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+              button: "{{ repeat.item }}"
+          - delay:
+              milliseconds: 400
+    - action: webostv.button
+      data:
+        entity_id: media_player.lg_webos_tv_oled55c3psa
+        button: "ENTER"
