@@ -79,6 +79,24 @@ flow_sala:
       data:
         app: "Flow"
 
+netflix_sala:
+  alias: "Netflix en la sala"
+  icon: mdi:netflix
+  description: "Enciende la TV del living si hace falta y abre Netflix. Pensado para Siri/Assist."
+  sequence:
+    - action: script.tv_app
+      data:
+        app: "Netflix"
+
+youtube_sala:
+  alias: "YouTube en la sala"
+  icon: mdi:youtube
+  description: "Enciende la TV del living si hace falta y abre YouTube. Pensado para Siri/Assist."
+  sequence:
+    - action: script.tv_app
+      data:
+        app: "YouTube"
+
 flow_canal_dormitorio:
   alias: "Flow: poner canal (dormitorio)"
   icon: mdi:television-guide
