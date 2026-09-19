@@ -7,6 +7,43 @@
   actions:
     - action: script.tv_living_encender
 
+- id: webhook_flow_sala
+  alias: "Webhook: Flow en la sala"
+  description: "Para Atajos de iOS sin token: POST a /api/webhook/<id>."
+  triggers:
+    - trigger: webhook
+      webhook_id: "goNLDUqlSbHTZ4WeFJDKmEIEvaiPivGM"
+      allowed_methods: [POST]
+      local_only: false
+  actions:
+    - action: script.turn_on
+      target:
+        entity_id: script.flow_sala
+
+- id: webhook_netflix_sala
+  alias: "Webhook: Netflix en la sala"
+  triggers:
+    - trigger: webhook
+      webhook_id: "iCFqYRj70mMMIeR7MRhUbECHmyTAT_HF"
+      allowed_methods: [POST]
+      local_only: false
+  actions:
+    - action: script.turn_on
+      target:
+        entity_id: script.netflix_sala
+
+- id: webhook_youtube_sala
+  alias: "Webhook: YouTube en la sala"
+  triggers:
+    - trigger: webhook
+      webhook_id: "yY6Wsop4_N8EBZy6HJBlcTDYxaHUUXEI"
+      allowed_methods: [POST]
+      local_only: false
+  actions:
+    - action: script.turn_on
+      target:
+        entity_id: script.youtube_sala
+
 - id: house_mode_llegada
   alias: "House mode: llegada"
   description: >
