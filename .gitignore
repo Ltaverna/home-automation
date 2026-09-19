@@ -1,0 +1,23 @@
+# Secretos
+.env
+*.pem
+*.key
+
+# Estado de runtime (no config)
+homeassistant/.storage/
+homeassistant/home-assistant.log*
+homeassistant/home-assistant_v2.db*
+homeassistant/.cloud/
+homeassistant/deps/
+homeassistant/tts/
+zigbee2mqtt/log/
+zigbee2mqtt/coordinator_backup.json
+frigate/media/
+esphome/.esphome/
+mosquitto/data/
+mosquitto/log/
+
+# Sistema
+__pycache__/
+*.swp
+.DS_Store
