@@ -1,1 +1,15 @@
-{}
+tv_living_encender:
+  alias: "Encender TV living (WoL)"
+  icon: mdi:television
+  sequence:
+    - action: wake_on_lan.send_magic_packet
+      data:
+        mac: "38:06:E6:1C:26:70"
+
+tv_dormitorio_encender:
+  alias: "Encender TV dormitorio (WoL)"
+  icon: mdi:television
+  sequence:
+    - action: wake_on_lan.send_magic_packet
+      data:
+        mac: "68:72:C3:80:C4:A8"

@@ -15,6 +15,9 @@ homeassistant:
   currency: ARS
   country: AR
 
+# WoL para encender las TVs (LG 38:06:E6:1C:26:70, Samsung 68:72:C3:80:C4:A8)
+wake_on_lan:
+
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml

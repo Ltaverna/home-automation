@@ -1,1 +1,8 @@
-[]
+- id: tv_living_wol
+  alias: "TV living: WoL al pedir encendido"
+  description: "El LG en deep-off no responde por webOS; este hook manda el magic packet."
+  triggers:
+    - trigger: webostv.turn_on
+      entity_id: media_player.lg_webos_tv_oled55c3psa
+  actions:
+    - action: script.tv_living_encender
