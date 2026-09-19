@@ -72,6 +72,15 @@ template:
             target:
               entity_id: media_player.lg_webos_tv_oled55c3psa
 
+# Puente a Apple Home: Siri nativo para los switches de apps de la sala.
+# El pairing se hace una vez desde la notificación que aparece en HA.
+homekit:
+  filter:
+    include_entities:
+      - switch.flow_sala
+      - switch.netflix_sala
+      - switch.youtube_sala
+
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
