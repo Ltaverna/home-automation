@@ -19,15 +19,32 @@ flow_canal:
   icon: mdi:television-guide
   description: >
     Abre Flow si no está activo y zapea al canal indicado mandando los dígitos
-    + ENTER. Los dígitos solo actúan si Flow está reproduciendo TV en vivo
-    (no en el menú de la app).
+    + ENTER. Acepta número (canal: 24) o nombre de la grilla (nombre: telefe).
+    Los dígitos solo actúan si Flow está reproduciendo TV en vivo (no en el menú).
   fields:
     canal:
       name: Canal
       description: "Número de canal de Flow (ej. 24)"
-      required: true
+      required: false
       example: 24
+    nombre:
+      name: Nombre
+      description: "Nombre del canal según la grilla (ej. telefe)"
+      required: false
+      example: "telefe"
+  variables:
+    # Grilla Flow (completar con la guía de la TV; claves en minúsculas sin espacios)
+    grilla:
+      telefe: 10
+    canal_num: >-
+      {% if canal is defined and canal | string | trim != '' %}
+        {{ canal }}
+      {% else %}
+        {{ grilla.get(nombre | default('') | lower | replace(' ', ''), 0) }}
+      {% endif %}
   sequence:
+    - condition: template
+      value_template: "{{ canal_num | int(0) > 0 }}"
     - if:
         - condition: template
           value_template: >
@@ -40,7 +57,7 @@ flow_canal:
             source: "Flow"
         - delay: "00:00:12"
     - repeat:
-        for_each: "{{ canal | string | list }}"
+        for_each: "{{ canal_num | string | trim | list }}"
         sequence:
           - action: webostv.button
             data:
@@ -52,3 +69,31 @@ flow_canal:
       data:
         entity_id: media_player.lg_webos_tv_oled55c3psa
         button: "ENTER"
+
+tv_app:
+  alias: "TV living: abrir app"
+  icon: mdi:apps
+  description: >
+    Abre una app en el LG por nombre exacto del source_list:
+    YouTube, Netflix, MUBI, Disney+, HBO Max, Prime Video, Spotify – Música y
+    podcasts, Plex, Apple TV, Flow, TV en Vivo, etc. Si la TV está apagada,
+    la despierta por WoL primero.
+  fields:
+    app:
+      name: App
+      description: "Nombre exacto de la app (ver source_list)"
+      required: true
+      example: "Netflix"
+  sequence:
+    - if:
+        - condition: template
+          value_template: "{{ states('media_player.lg_webos_tv_oled55c3psa') in ('off', 'unavailable') }}"
+      then:
+        - action: script.tv_living_encender
+        - wait_template: "{{ states('media_player.lg_webos_tv_oled55c3psa') not in ('off', 'unavailable') }}"
+          timeout: "00:00:30"
+    - action: media_player.select_source
+      target:
+        entity_id: media_player.lg_webos_tv_oled55c3psa
+      data:
+        source: "{{ app }}"
