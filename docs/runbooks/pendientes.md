@@ -1,5 +1,11 @@
 # Pendientes
 
+- Re-parear LG OLED C3 (integración webostv eliminada y lista para recargar limpia):
+  con la TV encendida + Quick Start+ activado → agregar integración → aceptar prompt en pantalla.
+  Entidad esperada: `media_player.lg_webos_tv_oled55c3psa` (sin sufijo).
+- Integrar Samsung QLED Q60T (dormitorio): integración local `samsungtv`, TV encendida,
+  aceptar popup. Anotar MAC para Wake-on-LAN. Habilita modo noche / "apagá todo".
+
 - Reservar IP 192.168.1.17 (R2130) y la IP de la LG (192.168.1.14) en el DHCP del router.
 - Dominio neuralcore.dev (Cloudflare) disponible: decidimos NO exponer HA públicamente por ahora
   (Tailscale cubre acceso remoto sin superficie de ataque). Reabrir solo si Tailscale molesta en
