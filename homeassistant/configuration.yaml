@@ -30,6 +30,48 @@ input_select:
       - NIGHT
     icon: mdi:home-account
 
+# Switches que envuelven scripts, porque las acciones de Atajos de iOS
+# (App Intents) solo listan ciertos dominios y los scripts no aparecen.
+# ON = abrir app (enciende TV por WoL si hace falta) / OFF = apagar TV.
+template:
+  - switch:
+      - name: "Flow sala"
+        unique_id: flow_sala_switch
+        icon: mdi:television-play
+        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'Flow') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.flow_sala
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+      - name: "Netflix sala"
+        unique_id: netflix_sala_switch
+        icon: mdi:netflix
+        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'Netflix') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.netflix_sala
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+      - name: "YouTube sala"
+        unique_id: youtube_sala_switch
+        icon: mdi:youtube
+        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'YouTube') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.youtube_sala
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
