@@ -1,10 +1,11 @@
 # Pendientes
 
-- Re-parear LG OLED C3 (integración webostv eliminada y lista para recargar limpia):
-  con la TV encendida + Quick Start+ activado → agregar integración → aceptar prompt en pantalla.
-  Entidad esperada: `media_player.lg_webos_tv_oled55c3psa` (sin sufijo).
-- Integrar Samsung QLED Q60T (dormitorio): integración local `samsungtv`, TV encendida,
-  aceptar popup. Anotar MAC para Wake-on-LAN. Habilita modo noche / "apagá todo".
+- HECHO 2026-09-19: LG C3 re-pareada (`media_player.lg_webos_tv_oled55c3psa`, 192.168.1.14) y
+  Samsung Q60T dormitorio integrada (`media_player.lucass_tv_60ta`, 192.168.1.16,
+  MAC 68:72:C3:80:C4:A8 para WoL). Sony HT-G700: sin red, se controla indirecto por
+  HDMI-CEC a través del Samsung. Reservar también la IP de la Samsung en el router.
+- Probar encendido remoto de ambas TVs con las TVs apagadas (LG: Quick Start+ activado;
+  Samsung: WoL). Si el LG no enciende, fallback wake_on_lan documentado en el plan Fase 1.
 
 - Reservar IP 192.168.1.17 (R2130) y la IP de la LG (192.168.1.14) en el DHCP del router.
 - Dominio neuralcore.dev (Cloudflare) disponible: decidimos NO exponer HA públicamente por ahora
