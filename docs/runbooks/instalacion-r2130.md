@@ -23,6 +23,14 @@
 - Nocturno 04:30 (cron de root) → /opt/backups/home-automation/ (14 días de retención).
 - Las configs también están en git; .env / homeassistant/.storage / mosquitto passwd SOLO en el backup.
 
+## Acceso remoto (Tailscale)
+- R2130 en tailnet: `100.105.233.7` / `https://r2130.tail71f19f.ts.net` (proxy `tailscale serve` → 8123).
+- HA Companion en iPhone: external URL = la URL de tailscale; internal URL = http://192.168.1.17:8123.
+- Gotcha HA 2026.x: la config del componente `http` se migra de YAML a `.storage/http` en el
+  PRIMER arranque (`yaml_migration_done: true`) y después el bloque `http:` del YAML SE IGNORA.
+  Si cambiás trusted_proxies en YAML y no aplica: parar HA, borrar `.storage/http` (backup antes)
+  y arrancar — la migración se re-ejecuta desde el YAML.
+
 ## Notas del hardware
 - reComputer AI R2130: Pi 5 8GB + Hailo-8 26 TOPS (`/dev/hailo0`, driver de fábrica) + NVMe 512GB.
 - Para Fase 4 (Frigate 0.16): verificar HailoRT == 4.21.0 en el host; si no coincide,
