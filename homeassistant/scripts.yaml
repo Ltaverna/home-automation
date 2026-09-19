@@ -70,6 +70,15 @@ flow_canal:
         entity_id: media_player.lg_webos_tv_oled55c3psa
         button: "ENTER"
 
+flow_sala:
+  alias: "Flow en la sala"
+  icon: mdi:television-play
+  description: "Enciende la TV del living si hace falta y abre Flow. Pensado para Siri/Assist."
+  sequence:
+    - action: script.tv_app
+      data:
+        app: "Flow"
+
 flow_canal_dormitorio:
   alias: "Flow: poner canal (dormitorio)"
   icon: mdi:television-guide
