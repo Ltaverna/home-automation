@@ -14,6 +14,19 @@
 
 Pendiente de instalación (sin comprar aún): NAD D3020 V2 (IR, Fase 3), aire split sin WiFi (IR, Fase 3), cerradura Philips DDL615 (autónoma, sin integración por decisión — ver spec §DDL615).
 
+### NAD D3020 V2 — mapa de entradas (living)
+
+| Entrada | Fuente | Estado |
+|---|---|---|
+| Optical | LG OLED C3 (TV/streaming) | en uso |
+| Bluetooth (aptX) | Spotify desde el teléfono | en uso |
+| Phono | bandeja de vinilos | en uso |
+| Coaxial | R2130 vía USB→S/PDIF (Music Assistant/Squeezelite) | Fase 5 |
+
+En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
+**selección de fuente** — o sea escenas tipo "modo vinilo" (Phono), "modo cine"
+(Optical) o "música" (Coax) van a ser posibles.
+
 ## Integraciones activas en HA
 
 | Integración | Config | Notas |
