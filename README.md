@@ -22,9 +22,11 @@ Spec completa: [`docs/superpowers/specs/2026-09-19-domotica-depto-design.md`](do
   reComputer R2130   LG OLED C3 (living)     Samsung Q60T (dorm.)
   192.168.1.17       192.168.1.14 · webOS    192.168.1.16 · Tizen
   Pi OS + Docker     WoL 38:06:E6:1C:26:70   WoL 68:72:C3:80:C4:A8
-        │                                          │
-        │                                    Sony HT-G700
-        │                                    (sin red; vía HDMI-CEC)
+        │                │ óptico                  │
+        │                ▼                   Sony HT-G700
+        │          NAD D3020 V2              (sin red; vía HDMI-CEC)
+        │          + Dynaudio Emit M10
+        │          (volumen real acá; IR en Fase 3)
         ├── homeassistant (host network, :8123)
         ├── mosquitto (:1883, auth obligatoria)
         └── [Fase 2+] zigbee2mqtt · frigate+Hailo · esphome · music-assistant

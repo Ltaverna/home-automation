@@ -8,7 +8,7 @@
 | Equipo | IP | Detalle |
 |---|---|---|
 | reComputer AI R2130 | 192.168.1.17 | Pi 5 8GB, Hailo-8 26 TOPS (`/dev/hailo0`), NVMe 512GB, Pi OS Bookworm 64. Corre además un crypto-bot en `/opt/crypto-bot` (cron 04:00) — no tocar |
-| LG OLED55C3PSA (living) | 192.168.1.14 | webOS por LAN. WoL MAC `38:06:E6:1C:26:70`. Óptico → NAD D3020 V2 |
+| LG OLED55C3PSA (living) | 192.168.1.14 | webOS por LAN. WoL MAC `38:06:E6:1C:26:70`. Óptico → NAD D3020 V2 + Dynaudio Emit M10. ⚠ El volumen real del living lo maneja el NAD (salida óptica de la TV es nivel fijo): los controles de volumen del LG en HA no afectan lo que suena; control real de volumen vía ESP32 IR en Fase 3 |
 | Samsung QLED Q60T (dormitorio) | 192.168.1.16 | Tizen por LAN. WoL MAC `68:72:C3:80:C4:A8`. HDMI eARC → Sony HT-G700 (la barra no tiene red; volumen/power vía CEC) |
 | iPhone 15 Pro Max | tailnet `100.86.243.112` | HA Companion (geofence) + Tailscale |
 
