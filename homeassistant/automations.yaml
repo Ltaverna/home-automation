@@ -230,3 +230,46 @@
     - action: input_boolean.turn_off
       target:
         entity_id: input_boolean.modo_paseo
+
+- id: aviso_tv_away
+  alias: "Aviso: TV prendida sin nadie"
+  description: "Estando AWAY, si una TV queda encendida 2 min, notif accionable con botón Apagar."
+  triggers:
+    - trigger: state
+      entity_id:
+        - media_player.lg_webos_tv_oled55c3psa
+        - media_player.tv_dormitorio
+      to: "on"
+      for: "00:02:00"
+  conditions:
+    - condition: state
+      entity_id: input_select.house_mode
+      state: "AWAY"
+    - condition: state
+      entity_id: input_boolean.modo_simulacion
+      state: "off"
+  actions:
+    - action: notify.mobile_app_lucass_iphone
+      data:
+        title: "📺 TV encendida sin nadie en casa"
+        message: "Quedó una TV prendida y estás fuera."
+        data:
+          actions:
+            - action: "APAGAR_TVS"
+              title: "Apagar"
+
+- id: aviso_tv_apagar
+  alias: "Aviso TV: acción Apagar"
+  description: "Responde al botón Apagar de la notificación accionable."
+  triggers:
+    - trigger: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "APAGAR_TVS"
+  actions:
+    - action: media_player.turn_off
+      target:
+        entity_id:
+          - media_player.lg_webos_tv_oled55c3psa
+          - media_player.tv_dormitorio
+      continue_on_error: true
