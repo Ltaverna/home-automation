@@ -108,6 +108,18 @@ template:
             target:
               entity_id: media_player.tv_dormitorio
 
+# Lanzamiento de apps en el Samsung Q60T: Samsung capó el canal local (ws) en
+# modelos 2020+; el único método que funciona es la API cloud de SmartThings.
+# Token en secrets.yaml (fuera de git). Teclas/power/dígitos siguen locales.
+rest_command:
+  st_tv_dormitorio_app:
+    url: "https://api.smartthings.com/v1/devices/bf18b0f0-0a56-6be5-a574-26ef4efdb123/commands"
+    method: post
+    headers:
+      Authorization: !secret st_bearer
+    content_type: "application/json"
+    payload: '{"commands":[{"component":"main","capability":"custom.launchapp","command":"launchApp","arguments":["{{ app_id }}"]}]}'
+
 # Dashboard "Control remoto" versionado en git (d-pad de ambas TVs)
 lovelace:
   dashboards:

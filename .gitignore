@@ -2,6 +2,7 @@
 .env
 *.pem
 *.key
+homeassistant/secrets.yaml
 mosquitto/config/passwd
 
 # Código de terceros gestionado por HACS (cubierto por el backup nocturno)

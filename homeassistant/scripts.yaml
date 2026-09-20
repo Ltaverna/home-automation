@@ -118,12 +118,9 @@ tv_app_dormitorio:
         - action: script.tv_dormitorio_encender
         - wait_template: "{{ states('media_player.tv_dormitorio') not in ('off', 'unavailable') }}"
           timeout: "00:00:40"
-    - action: media_player.play_media
-      target:
-        entity_id: media_player.tv_dormitorio
+    - action: rest_command.st_tv_dormitorio_app
       data:
-        media_content_type: app
-        media_content_id: "{{ app_id }}"
+        app_id: "{{ app_id }}"
 
 flow_dormitorio:
   alias: "Flow en el dormitorio"
