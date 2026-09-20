@@ -18,6 +18,14 @@
 - **Fase 4**: verificar HailoRT del host == 4.21.0 (lo que exige Frigate 0.16); si no,
   script oficial `user_installation.sh` de Frigate, NO el paquete apt.
 
+## Proyectos futuros
+
+- **Servidor MCP de Home Assistant** (controlar la casa desde Claude/ChatGPT): HA ya trae la
+  integración oficial "Model Context Protocol Server" que expone Assist a clientes MCP. No hay
+  que construir nada de cero — activar la integración + conectar el cliente. Requiere Assist
+  bien configurado (mejora con el Voice PE / Fase 5). Proyecto aparte con su propia spec.
+- **Reporte diario** de ocupación/uso (resumen a las 23h). Baja prioridad.
+
 ## Decisiones registradas
 
 - **Dominio neuralcore.dev (Cloudflare)**: NO exponer HA públicamente. Tailscale cubre el
