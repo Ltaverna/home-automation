@@ -30,6 +30,21 @@ input_select:
       - NIGHT
     icon: mdi:home-account
 
+# Helpers para automatizaciones de software puro (spec 2026-09-20)
+input_boolean:
+  modo_paseo:
+    name: Modo paseo
+    icon: mdi:dog-side
+  modo_simulacion:
+    name: Modo simulación (anti-robo)
+    icon: mdi:shield-home
+
+timer:
+  paseo:
+    name: Paseo perro
+    duration: "00:30:00"
+    restore: true
+
 # Switches que envuelven scripts, porque las acciones de Atajos de iOS
 # (App Intents) solo listan ciertos dominios y los scripts no aparecen.
 # ON = abrir app (enciende TV por WoL si hace falta) / OFF = apagar TV.
@@ -146,6 +161,8 @@ homekit:
         - switch.flow_dormitorio
         - switch.netflix_dormitorio
         - switch.youtube_dormitorio
+        - input_boolean.modo_paseo
+        - input_boolean.modo_simulacion
   - name: TV Sala
     port: 21064
     mode: accessory
