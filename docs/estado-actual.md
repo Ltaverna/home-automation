@@ -33,7 +33,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 |---|---|---|
 | MQTT | `localhost:1883`, usuario `ha` | password en `.env` de la R2130 |
 | LG webOS TV | 192.168.1.14 | entidad `media_player.lg_webos_tv_oled55c3psa` |
-| Samsung TV | 192.168.1.16 | `media_player.lucass_tv_60ta` + `remote.lucass_tv_60ta` |
+| Samsung TV (HACS `samsungtv_smart` 0.14.5 + SmartThings) | 192.168.1.16 | `media_player.tv_dormitorio` + `remote.tv_dormitorio`. Teclas/power/dígitos: local (ws). Apps: SOLO vía cloud SmartThings (`rest_command.st_tv_dormitorio_app`, token en `secrets.yaml` de la R2130) — Samsung capó el ws local en 2020+. IDs capturados: Flow=`fCCrJTSe28.Flow`, Netflix=`org.tizen.netflix-app`, YouTube=`9Ur5IzDKqV.TizenYouTube` |
 | Mobile App | Lucas's iPhone | `person.lucas`, `notify.mobile_app_lucass_iphone` |
 | HomeKit Bridge | puerto 21063 | expone los 3 switches de apps a Apple Home / Siri |
 | Bluetooth | adaptador interno R2130 | disponible para BLE futuro |
@@ -45,6 +45,12 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 - `person.lucas` — geofence del iPhone (tiempo real gracias a Tailscale)
 - `switch.flow_sala` / `switch.netflix_sala` / `switch.youtube_sala` — template switches:
   ON = encender TV (WoL) + abrir app · OFF = apagar TV · estado refleja el source real
+- `switch.flow_dormitorio` / `switch.netflix_dormitorio` / `switch.youtube_dormitorio` — ídem
+  para el Samsung (lanzan vía SmartThings). Los 6 expuestos a Siri por HomeKit Bridge.
+- Scripts nuevos dormitorio: `tv_app_dormitorio` (param `app_id`), `flow_dormitorio`,
+  `netflix_dormitorio`, `youtube_dormitorio`; `flow_canal_dormitorio` ahora abre Flow solo.
+- Gotcha operativo: tras un restart de HA, si el Samsung reporta estados raros
+  (off estando prendida, app None), recargar la config entry de samsungtv_smart.
 
 ## Scripts
 
