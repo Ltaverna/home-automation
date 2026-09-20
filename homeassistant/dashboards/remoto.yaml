@@ -117,6 +117,59 @@ views:
               action: call-service
               service: webostv.button
               data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: CHANNELUP }
+      - type: grid
+        title: Dígitos
+        columns: 3
+        square: false
+        cards:
+          - type: button
+            name: "1"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "1" } }
+          - type: button
+            name: "2"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "2" } }
+          - type: button
+            name: "3"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "3" } }
+          - type: button
+            name: "4"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "4" } }
+          - type: button
+            name: "5"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "5" } }
+          - type: button
+            name: "6"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "6" } }
+          - type: button
+            name: "7"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "7" } }
+          - type: button
+            name: "8"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "8" } }
+          - type: button
+            name: "9"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "9" } }
+          - type: button
+            icon: mdi:backspace-outline
+            name: Atrás
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: BACK } }
+          - type: button
+            name: "0"
+            show_icon: false
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: "0" } }
+          - type: button
+            icon: mdi:check-bold
+            name: OK
+            tap_action: { action: call-service, service: webostv.button, data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: ENTER } }
       - type: entities
         title: Apps rápidas
         entities:
@@ -243,5 +296,58 @@ views:
               action: call-service
               service: remote.send_command
               data: { entity_id: remote.lucass_tv_60ta, command: KEY_CHUP }
+      - type: grid
+        title: Dígitos
+        columns: 3
+        square: false
+        cards:
+          - type: button
+            name: "1"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_1 } }
+          - type: button
+            name: "2"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_2 } }
+          - type: button
+            name: "3"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_3 } }
+          - type: button
+            name: "4"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_4 } }
+          - type: button
+            name: "5"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_5 } }
+          - type: button
+            name: "6"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_6 } }
+          - type: button
+            name: "7"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_7 } }
+          - type: button
+            name: "8"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_8 } }
+          - type: button
+            name: "9"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_9 } }
+          - type: button
+            icon: mdi:backspace-outline
+            name: Atrás
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_RETURN } }
+          - type: button
+            name: "0"
+            show_icon: false
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_0 } }
+          - type: button
+            icon: mdi:check-bold
+            name: OK
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_ENTER } }
       - type: media-control
         entity: media_player.lucass_tv_60ta
