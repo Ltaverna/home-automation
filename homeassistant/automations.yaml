@@ -177,3 +177,20 @@
         entity_id: input_select.house_mode
       data:
         option: "HOME"
+
+- id: despertar_suave
+  alias: "Despertar suave"
+  description: "08:30 lun-vie estando en casa: TV dormitorio en Flow canal 14."
+  triggers:
+    - trigger: time
+      at: "08:30:00"
+  conditions:
+    - condition: time
+      weekday: [mon, tue, wed, thu, fri]
+    - condition: state
+      entity_id: person.lucas
+      state: "home"
+  actions:
+    - action: script.flow_canal_dormitorio
+      data:
+        canal: 14
