@@ -72,6 +72,16 @@ template:
             target:
               entity_id: media_player.lg_webos_tv_oled55c3psa
 
+# Dashboard "Control remoto" versionado en git (d-pad de ambas TVs)
+lovelace:
+  dashboards:
+    remoto-tv:
+      mode: yaml
+      title: Control remoto
+      icon: mdi:remote-tv
+      show_in_sidebar: true
+      filename: dashboards/remoto.yaml
+
 # Puente a Apple Home: Siri nativo para los switches de apps de la sala.
 # El pairing se hace una vez desde la notificación que aparece en HA.
 homekit:

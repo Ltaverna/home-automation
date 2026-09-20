@@ -1,0 +1,247 @@
+title: Control remoto
+views:
+  - title: Sala (LG)
+    path: sala
+    icon: mdi:sofa
+    cards:
+      - type: grid
+        columns: 3
+        square: true
+        cards:
+          - type: button
+            icon: mdi:arrow-left
+            name: Atrás
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: BACK }
+          - type: button
+            icon: mdi:chevron-up
+            name: " "
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: UP }
+          - type: button
+            icon: mdi:home
+            name: Home
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: HOME }
+          - type: button
+            icon: mdi:chevron-left
+            name: " "
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: LEFT }
+          - type: button
+            icon: mdi:circle-slice-8
+            name: OK
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: ENTER }
+          - type: button
+            icon: mdi:chevron-right
+            name: " "
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: RIGHT }
+          - type: button
+            icon: mdi:exit-to-app
+            name: Salir
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: EXIT }
+          - type: button
+            icon: mdi:chevron-down
+            name: " "
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: DOWN }
+          - type: button
+            icon: mdi:play-pause
+            name: Play/Pausa
+            tap_action:
+              action: call-service
+              service: media_player.media_play_pause
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa }
+      - type: grid
+        columns: 3
+        square: false
+        cards:
+          - type: button
+            icon: mdi:volume-minus
+            name: Vol −
+            tap_action:
+              action: call-service
+              service: media_player.volume_down
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa }
+          - type: button
+            icon: mdi:volume-mute
+            name: Mute
+            tap_action:
+              action: call-service
+              service: media_player.volume_mute
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, is_volume_muted: true }
+          - type: button
+            icon: mdi:volume-plus
+            name: Vol +
+            tap_action:
+              action: call-service
+              service: media_player.volume_up
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa }
+          - type: button
+            icon: mdi:chevron-double-down
+            name: Canal −
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: CHANNELDOWN }
+          - type: button
+            icon: mdi:television-classic
+            name: TV
+            tap_action:
+              action: call-service
+              service: media_player.select_source
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, source: "TV en Vivo" }
+          - type: button
+            icon: mdi:chevron-double-up
+            name: Canal +
+            tap_action:
+              action: call-service
+              service: webostv.button
+              data: { entity_id: media_player.lg_webos_tv_oled55c3psa, button: CHANNELUP }
+      - type: entities
+        title: Apps rápidas
+        entities:
+          - switch.flow_sala
+          - switch.netflix_sala
+          - switch.youtube_sala
+      - type: media-control
+        entity: media_player.lg_webos_tv_oled55c3psa
+
+  - title: Dormitorio (Samsung)
+    path: dormitorio
+    icon: mdi:bed
+    cards:
+      - type: grid
+        columns: 3
+        square: true
+        cards:
+          - type: button
+            icon: mdi:arrow-left
+            name: Atrás
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_RETURN }
+          - type: button
+            icon: mdi:chevron-up
+            name: " "
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_UP }
+          - type: button
+            icon: mdi:home
+            name: Home
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_HOME }
+          - type: button
+            icon: mdi:chevron-left
+            name: " "
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_LEFT }
+          - type: button
+            icon: mdi:circle-slice-8
+            name: OK
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_ENTER }
+          - type: button
+            icon: mdi:chevron-right
+            name: " "
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_RIGHT }
+          - type: button
+            icon: mdi:exit-to-app
+            name: Salir
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_EXIT }
+          - type: button
+            icon: mdi:chevron-down
+            name: " "
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_DOWN }
+          - type: button
+            icon: mdi:play-pause
+            name: Play/Pausa
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_PLAY_BACK }
+      - type: grid
+        columns: 3
+        square: false
+        cards:
+          - type: button
+            icon: mdi:volume-minus
+            name: Vol −
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_VOLDOWN }
+          - type: button
+            icon: mdi:volume-mute
+            name: Mute
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_MUTE }
+          - type: button
+            icon: mdi:volume-plus
+            name: Vol +
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_VOLUP }
+          - type: button
+            icon: mdi:chevron-double-down
+            name: Canal −
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_CHDOWN }
+          - type: button
+            icon: mdi:power
+            name: Power
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              data: { entity_id: script.tv_dormitorio_encender }
+          - type: button
+            icon: mdi:chevron-double-up
+            name: Canal +
+            tap_action:
+              action: call-service
+              service: remote.send_command
+              data: { entity_id: remote.lucass_tv_60ta, command: KEY_CHUP }
+      - type: media-control
+        entity: media_player.lucass_tv_60ta
