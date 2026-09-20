@@ -193,6 +193,25 @@ flow_canal_dormitorio:
       data:
         command: "KEY_ENTER"
 
+iniciar_paseo:
+  alias: "Iniciar paseo (perro)"
+  icon: mdi:dog-side
+  description: "Apaga TVs, arranca el timer de 30 min y notifica. AWAY queda suspendido."
+  sequence:
+    - action: media_player.turn_off
+      target:
+        entity_id:
+          - media_player.lg_webos_tv_oled55c3psa
+          - media_player.tv_dormitorio
+      continue_on_error: true
+    - action: timer.start
+      target:
+        entity_id: timer.paseo
+    - action: notify.mobile_app_lucass_iphone
+      data:
+        title: "🐕 Paseo"
+        message: "Modo paseo activo — AWAY suspendido 30 min."
+
 tv_app:
   alias: "TV living: abrir app"
   icon: mdi:apps

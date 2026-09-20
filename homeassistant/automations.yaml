@@ -119,6 +119,9 @@
         - condition: state
           entity_id: input_select.house_mode
           state: "CLEANING"
+    - condition: state
+      entity_id: input_boolean.modo_paseo
+      state: "off"
   actions:
     - action: input_select.select_option
       target:
@@ -194,3 +197,36 @@
     - action: script.flow_canal_dormitorio
       data:
         canal: 14
+
+- id: modo_paseo_inicio
+  alias: "Modo paseo: inicio"
+  description: "Al encender el switch modo_paseo, ejecuta las acciones de inicio."
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.modo_paseo
+      to: "on"
+  actions:
+    - action: script.iniciar_paseo
+
+- id: modo_paseo_fin
+  alias: "Modo paseo: fin"
+  description: "El timer llegó a 30 min o Lucas volvió a casa: se apaga el modo paseo."
+  triggers:
+    - trigger: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.paseo
+    - trigger: state
+      entity_id: person.lucas
+      to: "home"
+  conditions:
+    - condition: state
+      entity_id: input_boolean.modo_paseo
+      state: "on"
+  actions:
+    - action: timer.cancel
+      target:
+        entity_id: timer.paseo
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.modo_paseo
