@@ -193,63 +193,63 @@ views:
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_RETURN }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_RETURN }
           - type: button
             icon: mdi:chevron-up
             name: " "
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_UP }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_UP }
           - type: button
             icon: mdi:home
             name: Home
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_HOME }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_HOME }
           - type: button
             icon: mdi:chevron-left
             name: " "
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_LEFT }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_LEFT }
           - type: button
             icon: mdi:circle-slice-8
             name: OK
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_ENTER }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_ENTER }
           - type: button
             icon: mdi:chevron-right
             name: " "
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_RIGHT }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_RIGHT }
           - type: button
             icon: mdi:exit-to-app
             name: Salir
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_EXIT }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_EXIT }
           - type: button
             icon: mdi:chevron-down
             name: " "
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_DOWN }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_DOWN }
           - type: button
             icon: mdi:play-pause
             name: Play/Pausa
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_PLAY_BACK }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_PLAY_BACK }
       - type: grid
         columns: 3
         square: false
@@ -260,28 +260,28 @@ views:
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_VOLDOWN }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_VOLDOWN }
           - type: button
             icon: mdi:volume-mute
             name: Mute
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_MUTE }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_MUTE }
           - type: button
             icon: mdi:volume-plus
             name: Vol +
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_VOLUP }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_VOLUP }
           - type: button
             icon: mdi:chevron-double-down
             name: Canal −
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_CHDOWN }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_CHDOWN }
           - type: button
             icon: mdi:power
             name: Power
@@ -295,7 +295,7 @@ views:
             tap_action:
               action: call-service
               service: remote.send_command
-              data: { entity_id: remote.lucass_tv_60ta, command: KEY_CHUP }
+              data: { entity_id: remote.tv_dormitorio, command: KEY_CHUP }
       - type: grid
         title: Dígitos
         columns: 3
@@ -304,50 +304,50 @@ views:
           - type: button
             name: "1"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_1 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_1 } }
           - type: button
             name: "2"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_2 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_2 } }
           - type: button
             name: "3"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_3 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_3 } }
           - type: button
             name: "4"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_4 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_4 } }
           - type: button
             name: "5"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_5 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_5 } }
           - type: button
             name: "6"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_6 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_6 } }
           - type: button
             name: "7"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_7 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_7 } }
           - type: button
             name: "8"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_8 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_8 } }
           - type: button
             name: "9"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_9 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_9 } }
           - type: button
             icon: mdi:backspace-outline
             name: Atrás
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_RETURN } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_RETURN } }
           - type: button
             name: "0"
             show_icon: false
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_0 } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_0 } }
           - type: button
             icon: mdi:check-bold
             name: OK
-            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.lucass_tv_60ta, command: KEY_ENTER } }
+            tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_ENTER } }
       - type: media-control
-        entity: media_player.lucass_tv_60ta
+        entity: media_player.tv_dormitorio

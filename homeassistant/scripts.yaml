@@ -116,14 +116,14 @@ flow_canal_dormitorio:
         sequence:
           - action: remote.send_command
             target:
-              entity_id: remote.lucass_tv_60ta
+              entity_id: remote.tv_dormitorio
             data:
               command: "KEY_{{ repeat.item }}"
           - delay:
               milliseconds: 400
     - action: remote.send_command
       target:
-        entity_id: remote.lucass_tv_60ta
+        entity_id: remote.tv_dormitorio
       data:
         command: "KEY_ENTER"
 
