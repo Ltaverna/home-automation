@@ -71,6 +71,42 @@ template:
           - action: media_player.turn_off
             target:
               entity_id: media_player.lg_webos_tv_oled55c3psa
+      - name: "Flow dormitorio"
+        unique_id: flow_dormitorio_switch
+        icon: mdi:television-play
+        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', 'fCCrJTSe28.Flow') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.flow_dormitorio
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.tv_dormitorio
+      - name: "Netflix dormitorio"
+        unique_id: netflix_dormitorio_switch
+        icon: mdi:netflix
+        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', 'org.tizen.netflix-app') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.netflix_dormitorio
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.tv_dormitorio
+      - name: "YouTube dormitorio"
+        unique_id: youtube_dormitorio_switch
+        icon: mdi:youtube
+        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', '9Ur5IzDKqV.TizenYouTube') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.youtube_dormitorio
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.tv_dormitorio
 
 # Dashboard "Control remoto" versionado en git (d-pad de ambas TVs)
 lovelace:
@@ -95,6 +131,9 @@ homekit:
         - switch.flow_sala
         - switch.netflix_sala
         - switch.youtube_sala
+        - switch.flow_dormitorio
+        - switch.netflix_dormitorio
+        - switch.youtube_dormitorio
   - name: TV Sala
     port: 21064
     mode: accessory

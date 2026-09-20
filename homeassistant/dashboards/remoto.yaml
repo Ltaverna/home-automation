@@ -349,5 +349,11 @@ views:
             icon: mdi:check-bold
             name: OK
             tap_action: { action: call-service, service: remote.send_command, data: { entity_id: remote.tv_dormitorio, command: KEY_ENTER } }
+      - type: entities
+        title: Apps rápidas
+        entities:
+          - switch.flow_dormitorio
+          - switch.netflix_dormitorio
+          - switch.youtube_dormitorio
       - type: media-control
         entity: media_player.tv_dormitorio

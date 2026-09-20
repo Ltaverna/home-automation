@@ -97,13 +97,64 @@ youtube_sala:
       data:
         app: "YouTube"
 
+tv_app_dormitorio:
+  alias: "TV dormitorio: abrir app"
+  icon: mdi:apps
+  description: >
+    Lanza una app en el Samsung por su ID Tizen (capturados empíricamente vía
+    SmartThings): Flow=fCCrJTSe28.Flow, Netflix=org.tizen.netflix-app,
+    YouTube=9Ur5IzDKqV.TizenYouTube. Enciende la TV por WoL si hace falta.
+  fields:
+    app_id:
+      name: App ID
+      description: "ID Tizen de la app"
+      required: true
+      example: "fCCrJTSe28.Flow"
+  sequence:
+    - if:
+        - condition: template
+          value_template: "{{ states('media_player.tv_dormitorio') in ('off', 'unavailable') }}"
+      then:
+        - action: script.tv_dormitorio_encender
+        - wait_template: "{{ states('media_player.tv_dormitorio') not in ('off', 'unavailable') }}"
+          timeout: "00:00:40"
+    - action: media_player.play_media
+      target:
+        entity_id: media_player.tv_dormitorio
+      data:
+        media_content_type: app
+        media_content_id: "{{ app_id }}"
+
+flow_dormitorio:
+  alias: "Flow en el dormitorio"
+  icon: mdi:television-play
+  sequence:
+    - action: script.tv_app_dormitorio
+      data:
+        app_id: "fCCrJTSe28.Flow"
+
+netflix_dormitorio:
+  alias: "Netflix en el dormitorio"
+  icon: mdi:netflix
+  sequence:
+    - action: script.tv_app_dormitorio
+      data:
+        app_id: "org.tizen.netflix-app"
+
+youtube_dormitorio:
+  alias: "YouTube en el dormitorio"
+  icon: mdi:youtube
+  sequence:
+    - action: script.tv_app_dormitorio
+      data:
+        app_id: "9Ur5IzDKqV.TizenYouTube"
+
 flow_canal_dormitorio:
   alias: "Flow: poner canal (dormitorio)"
   icon: mdi:television-guide
   description: >
-    Manda los dígitos + ENTER al Samsung por remote.send_command. Requiere que
-    la app Flow ya esté abierta reproduciendo TV en vivo (el samsungtv nativo
-    no puede lanzar apps en modelos 2020+; ver pendientes: ha-samsungtv-smart).
+    Abre Flow si no está activa y zapea con dígitos + ENTER vía
+    remote.send_command. Los dígitos solo actúan reproduciendo TV en vivo.
   fields:
     canal:
       name: Canal
@@ -111,6 +162,12 @@ flow_canal_dormitorio:
       required: true
       example: 24
   sequence:
+    - if:
+        - condition: template
+          value_template: "{{ state_attr('media_player.tv_dormitorio', 'app_id') != 'fCCrJTSe28.Flow' }}"
+      then:
+        - action: script.flow_dormitorio
+        - delay: "00:00:12"
     - repeat:
         for_each: "{{ canal | string | trim | list }}"
         sequence:
