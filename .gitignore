@@ -4,6 +4,9 @@
 *.key
 mosquitto/config/passwd
 
+# Código de terceros gestionado por HACS (cubierto por el backup nocturno)
+homeassistant/custom_components/
+
 # Estado de runtime (no config)
 homeassistant/.storage/
 homeassistant/home-assistant.log*
