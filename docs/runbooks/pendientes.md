@@ -1,20 +1,43 @@
 # Pendientes
 
-- HECHO 2026-09-19: LG C3 re-pareada (`media_player.lg_webos_tv_oled55c3psa`, 192.168.1.14) y
-  Samsung Q60T dormitorio integrada (`media_player.lucass_tv_60ta`, 192.168.1.16,
-  MAC 68:72:C3:80:C4:A8 para WoL). Sony HT-G700: sin red, se controla indirecto por
-  HDMI-CEC a través del Samsung. Reservar también la IP de la Samsung en el router.
-- Samsung Q60T: la integración nativa no lanza apps en modelos 2020+ (endpoint REST removido).
-  Si se quiere "poné Netflix" en el dormitorio: integración HACS ollo69/ha-samsungtv-smart
-  (apps vía SmartThings). Zapping de canales ya resuelto con remote.send_command KEY_*.
-- Cargar grilla Flow nombre→número en script.flow_canal (dictada por Lucas desde la guía).
-- Probar encendido remoto de ambas TVs con las TVs apagadas (LG: Quick Start+ activado;
-  Samsung: WoL). Si el LG no enciende, fallback wake_on_lan documentado en el plan Fase 1.
+> Actualizado: 2026-09-19 (noche). Lo resuelto se mueve al final con fecha.
 
-- Reservar IP 192.168.1.17 (R2130) y la IP de la LG (192.168.1.14) en el DHCP del router.
-- Dominio neuralcore.dev (Cloudflare) disponible: decidimos NO exponer HA públicamente por ahora
-  (Tailscale cubre acceso remoto sin superficie de ataque). Reabrir solo si Tailscale molesta en
-  el iPhone (conflicto con otro VPN) o si hay que dar acceso a terceros → Cloudflare Tunnel + Access.
-- Acceso remoto a HA para geofence en tiempo real (Fase 2): evaluar
-  Nabu Casa Cloud (USD 6.50/mes, financia el proyecto HA) vs Tailscale (gratis).
-- Fase 4: verificar versión HailoRT del host vs la requerida por Frigate (4.21.0 para 0.16).
+## Abiertos
+
+- **Reservar IPs en el DHCP del router**: 192.168.1.17 (R2130), 192.168.1.14 (LG),
+  192.168.1.16 (Samsung).
+- **Cargar la grilla Flow** nombre→número en `script.flow_canal` (Lucas la dicta desde la
+  guía; hoy solo tiene `telefe: 10`).
+- **Activar Quick Start+ en el LG**: hoy al apagarse queda `unavailable` (deep-off). El WoL
+  la enciende igual, pero con Quick Start+ quedaría visible en standby y el estado sería
+  más prolijo.
+- **Test de vida real de llegada/salida**: primera vez que Lucas salga del depto, verificar
+  notificación AWAY (~5 min) + apagado de TVs, y HOME al volver. Ajustar geofence si es lento.
+- **Configurar HACS** (está instalado, falta el login con GitHub en Settings → Integrations →
+  Add → HACS). Sirve para updates automáticos de `samsungtv_smart` y futuras integraciones.
+- **Fase 4**: verificar HailoRT del host == 4.21.0 (lo que exige Frigate 0.16); si no,
+  script oficial `user_installation.sh` de Frigate, NO el paquete apt.
+
+## Decisiones registradas
+
+- **Dominio neuralcore.dev (Cloudflare)**: NO exponer HA públicamente. Tailscale cubre el
+  acceso remoto sin superficie de ataque. Reabrir solo si Tailscale molesta en el iPhone
+  (conflicto con otro VPN) o hay que dar acceso a terceros → Cloudflare Tunnel + Access.
+- **Apple TV: no comprar** (2026-09-19). No aporta nada al roadmap: acceso remoto ya resuelto
+  (Tailscale), sin dispositivos Thread, la C3 ya tiene AirPlay 2, el remote del Centro de
+  Control se logró vía HA, y la voz local viene con el Voice PE. Reevaluar solo como
+  dispositivo de streaming/entretenimiento.
+- **Apps del Samsung = cloud SmartThings**: única pieza cloud del sistema, sin alternativa
+  local (Samsung capó el ws en 2020+). Aislada en `rest_command.st_tv_dormitorio_app`.
+
+## Resueltos
+
+- 2026-09-19 · Acceso remoto para geofence: **Tailscale** (descartado Nabu Casa por ahora).
+- 2026-09-19 · LG C3 re-pareada limpia + Samsung Q60T integrada (luego migrada a
+  `samsungtv_smart` con SmartThings; entidades `media_player.tv_dormitorio` + `remote.tv_dormitorio`).
+- 2026-09-19 · Encendido remoto de ambas TVs validado por WoL (LG `38:06:E6:1C:26:70`,
+  Samsung `68:72:C3:80:C4:A8`).
+- 2026-09-19 · Apps en el dormitorio: resuelto vía HACS `ha-samsungtv-smart` + SmartThings API.
+  IDs Tizen capturados empíricamente: Flow=`fCCrJTSe28.Flow`, Netflix=`org.tizen.netflix-app`,
+  YouTube=`9Ur5IzDKqV.TizenYouTube`.
+- 2026-09-19 · Sony HT-G700: sin red; controlada indirecto por HDMI-CEC a través del Samsung.

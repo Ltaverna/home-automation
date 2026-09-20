@@ -35,7 +35,9 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | LG webOS TV | 192.168.1.14 | entidad `media_player.lg_webos_tv_oled55c3psa` |
 | Samsung TV (HACS `samsungtv_smart` 0.14.5 + SmartThings) | 192.168.1.16 | `media_player.tv_dormitorio` + `remote.tv_dormitorio`. Teclas/power/dígitos: local (ws). Apps: SOLO vía cloud SmartThings (`rest_command.st_tv_dormitorio_app`, token en `secrets.yaml` de la R2130) — Samsung capó el ws local en 2020+. IDs capturados: Flow=`fCCrJTSe28.Flow`, Netflix=`org.tizen.netflix-app`, YouTube=`9Ur5IzDKqV.TizenYouTube` |
 | Mobile App | Lucas's iPhone | `person.lucas`, `notify.mobile_app_lucass_iphone` |
-| HomeKit Bridge | puerto 21063 | expone los 3 switches de apps a Apple Home / Siri |
+| HomeKit Bridge "HASS Bridge" | puerto 21063 | expone los 6 switches de apps (sala + dormitorio) a Apple Home / Siri |
+| HomeKit accessory "TV Sala" | puerto 21064 | el LG como TV HomeKit → remote del Centro de Control de iOS (teclas mapeadas por la automatización `homekit_remote_lg`) |
+| HACS | instalado, **sin configurar** | login GitHub pendiente; gestiona `samsungtv_smart` |
 | Bluetooth | adaptador interno R2130 | disponible para BLE futuro |
 | Tailscale (host, no HA) | `tailscale serve` → 8123 | `https://r2130.tail71f19f.ts.net` |
 
@@ -75,10 +77,13 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 
 ## Control desde el iPhone
 
-1. **Siri nativo (recomendado):** HomeKit Bridge → app Casa → "Oye Siri, enciende Flow sala".
-   Solo en LAN (no hay hub Apple TV/HomePod).
-2. **App HA:** tarjetas de TVs + switches + scripts; funciona también fuera de casa (Tailscale).
-3. **Atajos por webhook (plan C):** POST a `https://r2130.tail71f19f.ts.net/api/webhook/<id>`
+1. **Siri nativo:** app Casa → "Oye Siri, enciende Flow sala / Netflix dormitorio / ..."
+   (los 6 switches). Solo en LAN (no hay hub Apple TV/HomePod — decisión: no comprar).
+2. **Remote del Centro de Control de iOS:** deslizar → ícono remoto → "TV Sala" → pad táctil
+   para navegar el LG (perfil de YouTube, menús). 100% nativo Apple.
+3. **App HA → dashboard "Control remoto":** d-pad + dígitos + apps + volumen para ambas TVs;
+   funciona también fuera de casa (Tailscale).
+4. **Atajos por webhook (plan C):** POST a `https://r2130.tail71f19f.ts.net/api/webhook/<id>`
    (IDs en `automations.yaml`). Funciona fuera de casa con Tailscale activo.
 
 ## Accesos y secretos (nada de esto está en git)
@@ -88,9 +93,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 - `.env` + `mosquitto/config/passwd` + `homeassistant/.storage`: solo en la R2130 y en el backup nocturno (`/opt/backups/home-automation/`, 04:30, retiene 14)
 - Deploy key GitHub read-only en la R2130
 
-## Verificaciones pendientes de la vida real
+## Pendientes
 
-- Primera salida/llegada real del depto (notificaciones AWAY/HOME y timing del geofence)
-- Activar Quick Start+ en el LG para que quede accesible en standby (hoy queda `unavailable`
-  al apagarse; el WoL funciona igual)
-- Dictar la grilla de canales Flow para `flow_canal`
+Ver [`runbooks/pendientes.md`](runbooks/pendientes.md) — abiertos, decisiones registradas
+y resueltos con fecha.

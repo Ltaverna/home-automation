@@ -12,12 +12,23 @@
 3. Generar clave `ssh-keygen -t ed25519` y re-autorizarla como deploy key (read-only) del repo.
 4. `sudo mkdir -p /opt/home-automation && sudo chown pi: /opt/home-automation`
    `git clone git@github.com:Ltaverna/home-automation.git /opt/home-automation`
-5. Restaurar del último backup (tiene .env, mosquitto/config/passwd y
-   homeassistant/.storage): `sudo tar -xzf config-<fecha>.tar.gz -C /opt`
-   (o recrear .env desde .env.example + passwd con mosquitto_passwd si no hay backup).
+5. Restaurar del último backup (tiene .env, mosquitto/config/passwd,
+   homeassistant/.storage, homeassistant/secrets.yaml y homeassistant/custom_components):
+   `sudo tar -xzf config-<fecha>.tar.gz -C /opt`
+   Sin backup, recrear a mano:
+   - `.env` desde `.env.example` + passwd con `mosquitto_passwd`
+   - `homeassistant/secrets.yaml`: `st_bearer: "Bearer <token SmartThings>"` (regenerar
+     en account.smartthings.com/tokens, scopes Devices)
+   - custom_components: HACS (`wget -O - https://get.hacs.xyz | bash -` dentro del
+     contenedor) + `samsungtv_smart` (release zip de ollo69/ha-samsungtv-smart)
 6. Permisos mosquitto: `sudo chown 1883:1883 mosquitto/config/passwd mosquitto/data mosquitto/log && sudo chmod 600 mosquitto/config/passwd`
 7. `cd /opt/home-automation && docker compose up -d`
 8. Re-agregar el cron de backup: `30 4 * * * /opt/home-automation/scripts/backup.sh`
+9. Tailscale: `curl -fsSL https://tailscale.com/install.sh | sh && sudo tailscale up`
+   (autenticar) y `sudo tailscale serve --bg 8123`.
+10. Si `.storage` se perdió: rehacer onboarding + integraciones (MQTT, webOS con pairing en
+    TV, samsungtv_smart con token ST, HomeKit re-pairing en app Casa) y regenerar tokens de
+    API (el del mini-PC vive en `~/.ha_token`).
 
 ## Backups
 - Nocturno 04:30 (cron de root) → /opt/backups/home-automation/ (14 días de retención).

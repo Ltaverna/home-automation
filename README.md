@@ -42,7 +42,11 @@ Spec completa: [`docs/superpowers/specs/2026-09-19-domotica-depto-design.md`](do
 | `homeassistant` | Cerebro: automatizaciones, house modes, integraciones | host network, caps BT (NET_ADMIN/NET_RAW), dbus |
 | `mosquitto` | Broker MQTT | anónimo rechazado; passwd fuera de git |
 
-Los secretos viven en `.env` y `mosquitto/config/passwd` (ambos fuera de git, incluidos en el backup nocturno).
+Dentro de HA además: **HACS** (instalado, pendiente de configurar) y la integración custom
+**`samsungtv_smart`** (ollo69, para la TV del dormitorio) en `custom_components/` (fuera de git).
+
+Los secretos viven en `.env`, `mosquitto/config/passwd` y `homeassistant/secrets.yaml`
+(token SmartThings) — todos fuera de git, incluidos en el backup nocturno.
 
 ## Estructura del repo
 
@@ -50,10 +54,13 @@ Los secretos viven en `.env` y `mosquitto/config/passwd` (ambos fuera de git, in
 ├── docker-compose.yml
 ├── .env.example              → copiar a .env en la R2130
 ├── homeassistant/
-│   ├── configuration.yaml    → base + http/proxy + input_select + template switches + homekit
-│   ├── automations.yaml      → house modes, WoL hook del LG, webhooks iOS
-│   ├── scripts.yaml          → encendido TVs, apps, canales Flow
-│   └── scenes.yaml
+│   ├── configuration.yaml    → base + proxy + input_select + template switches + homekit + rest_command
+│   ├── automations.yaml      → house modes, WoL hook del LG, webhooks iOS, remote HomeKit→LG
+│   ├── scripts.yaml          → encendido TVs, apps (sala y dormitorio), canales Flow
+│   ├── scenes.yaml
+│   ├── dashboards/remoto.yaml → dashboard "Control remoto" (d-pad, dígitos, apps, 2 TVs)
+│   ├── secrets.yaml          → token SmartThings (NO va a git)
+│   └── custom_components/    → HACS + samsungtv_smart (NO va a git; en backup)
 ├── mosquitto/config/mosquitto.conf
 ├── scripts/backup.sh         → cron 04:30 en la R2130 → /opt/backups (retiene 14)
 └── docs/
@@ -91,16 +98,18 @@ La R2130 tiene deploy key **read-only**: nunca commitea, solo pullea.
 ## Gotchas conocidos (leer antes de pelearse con HA)
 
 1. **`http:` en YAML se ignora después del primer boot** — HA 2026 migra esa config a `.storage/http` (`yaml_migration_done: true`). Si cambiás `trusted_proxies` y no aplica: parar HA, borrar `.storage/http` (con backup), arrancar. Detalle en el runbook.
-2. **Samsung 2020+: no se pueden lanzar apps** con la integración nativa (endpoint REST removido). Zapping por `remote.send_command KEY_*` sí funciona. Apps → HACS `ha-samsungtv-smart` si algún día hace falta.
+2. **Samsung 2020+: las apps solo se lanzan por la nube de SmartThings** — Samsung capó tanto el endpoint REST como el launch por websocket local. Resuelto con `rest_command.st_tv_dormitorio_app` (token en `secrets.yaml`); es la única pieza cloud del sistema. Teclas/power/dígitos/volumen siguen locales vía `remote.send_command KEY_*`.
 3. **El picker de Atajos de iOS (App Intents) solo lista ciertos dominios** — scripts no aparecen; por eso los switches template. Su caché tarda en refrescar (reabrir app HA / reiniciar iPhone).
 4. **Entidades fantasma del LG**: si la integración webostv se re-parea, HA puede resucitar entidades viejas con sufijo `_2`. Limpiar por WebSocket API (`config/entity_registry/remove` + `update`), no editando `.storage` a mano.
+5. **samsungtv_smart tras un restart de HA** puede quedar con la conexión ws a medias (estado `off`/app `None` con la TV prendida, comandos que no llegan): recargar la config entry (Settings → Integrations → TV Dormitorio → Reload, o por API).
+6. **El volumen del LG en HA no mueve el audio del living** — la salida óptica es de nivel fijo; el volumen real lo tiene el NAD (IR en Fase 3).
 
 ## Roadmap
 
 | Fase | Contenido | Estado |
 |---|---|---|
 | 1 — Base | R2130 + Docker + HA + MQTT + TVs + iPhone + Tailscale + backups | ✅ 2026-09-19 |
-| 1.5 — Extras | house_mode, WoL, apps/canales, Siri (HomeKit bridge) | ✅ 2026-09-19 |
+| 1.5 — Extras | house_mode, WoL, apps/canales en ambas TVs (LG local, Samsung vía ST), switches+Siri (HomeKit), remote Centro de Control iOS, dashboard control remoto, webhooks, HACS | ✅ 2026-09-19 |
 | 2 — Presencia | SLZB-06M + Zigbee2MQTT, sensor puerta, mmWave, llegada/salida reales | ⏳ espera compra USA |
 | 3 — Living | Shelly Dimmer (electricista), ESP32 IR → NAD + aire, Modo Cine | ⏳ |
 | 4 — Cámara + AI | HailoRT 4.21 + Frigate + Reolink, person/dog, modo CLEANING | ⏳ |
