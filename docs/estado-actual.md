@@ -56,13 +56,23 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 
 ## Scripts
 
+### Sala (LG)
+
 | Script | Qué hace |
 |---|---|
-| `tv_living_encender` / `tv_dormitorio_encender` | Magic packet WoL a cada TV |
-| `tv_app` (param `app`) | LG: enciende si hace falta, espera boot, abre la app (nombres del source_list) |
+| `tv_living_encender` | Magic packet WoL al LG |
+| `tv_app` (param `app`) | Enciende si hace falta, espera boot, abre la app por nombre del `source_list` |
 | `flow_sala` / `netflix_sala` / `youtube_sala` | Atajos sin parámetros sobre `tv_app` |
-| `flow_canal` (param `canal` o `nombre`) | LG: zapping en Flow — dígitos + ENTER. Grilla nombre→número en el propio script (**incompleta: solo telefe=10, falta que Lucas dicte la suya**) |
-| `flow_canal_dormitorio` (param `canal`) | Samsung: dígitos + ENTER vía `remote.send_command KEY_*`. Requiere Flow ya abierto |
+| `flow_canal` (param `canal` o `nombre`) | Abre Flow si no está activo y zapea con dígitos + ENTER. Acepta número o nombre de la grilla nombre→número del propio script (**incompleta: solo telefe=10, falta que Lucas dicte la suya**) |
+
+### Dormitorio (Samsung)
+
+| Script | Qué hace |
+|---|---|
+| `tv_dormitorio_encender` | Magic packet WoL al Samsung |
+| `tv_app_dormitorio` (param `app_id`) | Enciende si hace falta, espera boot, lanza la app por su ID Tizen vía SmartThings (`rest_command`) |
+| `flow_dormitorio` / `netflix_dormitorio` / `youtube_dormitorio` | Atajos sin parámetros sobre `tv_app_dormitorio` con los IDs Tizen |
+| `flow_canal_dormitorio` (param `canal`) | Abre Flow si no está activo y zapea con dígitos + ENTER vía `remote.send_command KEY_*` |
 
 ## Automatizaciones
 
