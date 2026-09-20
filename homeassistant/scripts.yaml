@@ -150,21 +150,32 @@ flow_canal_dormitorio:
   alias: "Flow: poner canal (dormitorio)"
   icon: mdi:television-guide
   description: >
-    Abre Flow si no está activa y zapea con dígitos + ENTER vía
-    remote.send_command. Los dígitos solo actúan reproduciendo TV en vivo.
+    Abre Flow desde cero (enciende la TV si hace falta), navega a la Guía de
+    Flow (abajo, abajo, derecha, ENTER) y tipea el número de canal + ENTER.
+    Ruta mapeada empíricamente en la app Flow del Samsung Q60T.
   fields:
     canal:
       name: Canal
-      description: "Número de canal de Flow (ej. 24)"
+      description: "Número de canal de Flow (ej. 14)"
       required: true
-      example: 24
+      example: 14
   sequence:
-    - if:
-        - condition: template
-          value_template: "{{ state_attr('media_player.tv_dormitorio', 'app_id') != 'fCCrJTSe28.Flow' }}"
-      then:
-        - action: script.flow_dormitorio
-        - delay: "00:00:12"
+    # Abrir Flow para partir del home conocido (enciende la TV por WoL si hace falta)
+    - action: script.flow_dormitorio
+    - delay: "00:00:18"          # esperar que cargue el home de Flow
+    # Navegar a la Guía: abajo, abajo, derecha, ENTER (2 s entre teclas)
+    - repeat:
+        for_each: ["KEY_DOWN", "KEY_DOWN", "KEY_RIGHT", "KEY_ENTER"]
+        sequence:
+          - action: remote.send_command
+            target:
+              entity_id: remote.tv_dormitorio
+            data:
+              command: "{{ repeat.item }}"
+          - delay:
+              seconds: 2
+    - delay: "00:00:02"          # que termine de abrir la Guía
+    # Tipear el número de canal (dígitos rápidos) + ENTER
     - repeat:
         for_each: "{{ canal | string | trim | list }}"
         sequence:
@@ -174,7 +185,8 @@ flow_canal_dormitorio:
             data:
               command: "KEY_{{ repeat.item }}"
           - delay:
-              milliseconds: 400
+              milliseconds: 300
+    - delay: "00:00:01"
     - action: remote.send_command
       target:
         entity_id: remote.tv_dormitorio
