@@ -44,6 +44,38 @@
       target:
         entity_id: script.youtube_sala
 
+- id: homekit_remote_lg
+  alias: "HomeKit remote → botones LG"
+  description: "Traduce las teclas del control del Centro de Control de iOS a webostv.button."
+  mode: queued
+  triggers:
+    - trigger: event
+      event_type: homekit_tv_remote_key_pressed
+      event_data:
+        entity_id: media_player.lg_webos_tv_oled55c3psa
+  variables:
+    keymap:
+      arrow_up: UP
+      arrow_down: DOWN
+      arrow_left: LEFT
+      arrow_right: RIGHT
+      select: ENTER
+      back: BACK
+      exit: EXIT
+      information: INFO
+  actions:
+    - choose:
+        - conditions: "{{ trigger.event.data.key_name == 'play_pause' }}"
+          sequence:
+            - action: media_player.media_play_pause
+              target:
+                entity_id: media_player.lg_webos_tv_oled55c3psa
+      default:
+        - action: webostv.button
+          data:
+            entity_id: media_player.lg_webos_tv_oled55c3psa
+            button: "{{ keymap[trigger.event.data.key_name] }}"
+
 - id: house_mode_llegada
   alias: "House mode: llegada"
   description: >

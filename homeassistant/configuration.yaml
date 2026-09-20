@@ -84,12 +84,23 @@ lovelace:
 
 # Puente a Apple Home: Siri nativo para los switches de apps de la sala.
 # El pairing se hace una vez desde la notificación que aparece en HA.
+# Segunda instancia en modo accessory: la TV LG como "HomeKit TV" → habilita
+# el control remoto del Centro de Control de iOS (las teclas llegan como
+# eventos homekit_tv_remote_key_pressed, mapeados en automations.yaml).
 homekit:
-  filter:
-    include_entities:
-      - switch.flow_sala
-      - switch.netflix_sala
-      - switch.youtube_sala
+  - name: HASS Bridge
+    port: 21063
+    filter:
+      include_entities:
+        - switch.flow_sala
+        - switch.netflix_sala
+        - switch.youtube_sala
+  - name: TV Sala
+    port: 21064
+    mode: accessory
+    filter:
+      include_entities:
+        - media_player.lg_webos_tv_oled55c3psa
 
 automation: !include automations.yaml
 script: !include scripts.yaml
