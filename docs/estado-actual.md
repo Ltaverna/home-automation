@@ -1,6 +1,6 @@
 # Estado actual — inventario vivo
 
-> Actualizado: 2026-09-19. Actualizar este documento cuando se agregue/quite hardware,
+> Actualizado: 2026-09-20. Actualizar este documento cuando se agregue/quite hardware,
 > integraciones, scripts o automatizaciones.
 
 ## Hardware en producción
@@ -49,6 +49,8 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
   ON = encender TV (WoL) + abrir app · OFF = apagar TV · estado refleja el source real
 - `switch.flow_dormitorio` / `switch.netflix_dormitorio` / `switch.youtube_dormitorio` — ídem
   para el Samsung (lanzan vía SmartThings). Los 6 expuestos a Siri por HomeKit Bridge.
+- `input_boolean.modo_paseo` — paseo del perro; suspende AWAY 30 min (timer `timer.paseo`)
+- `input_boolean.modo_simulacion` — "modo vacío" anti-robo. Ambos expuestos a Siri (HomeKit)
 - Scripts nuevos dormitorio: `tv_app_dormitorio` (param `app_id`), `flow_dormitorio`,
   `netflix_dormitorio`, `youtube_dormitorio`; `flow_canal_dormitorio` ahora abre Flow solo.
 - Gotcha operativo: tras un restart de HA, si el Samsung reporta estados raros
@@ -72,7 +74,13 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | `tv_dormitorio_encender` | Magic packet WoL al Samsung |
 | `tv_app_dormitorio` (param `app_id`) | Enciende si hace falta, espera boot, lanza la app por su ID Tizen vía SmartThings (`rest_command`) |
 | `flow_dormitorio` / `netflix_dormitorio` / `youtube_dormitorio` | Atajos sin parámetros sobre `tv_app_dormitorio` con los IDs Tizen |
-| `flow_canal_dormitorio` (param `canal`) | Abre Flow si no está activo y zapea con dígitos + ENTER vía `remote.send_command KEY_*` |
+| `flow_canal_dormitorio` (param `canal`) | Abre Flow, navega a la Guía (abajo, abajo, derecha, ENTER) y tipea el canal + ENTER vía `remote.send_command`. Ruta mapeada de la app Flow del Samsung |
+
+### General
+
+| Script | Qué hace |
+|---|---|
+| `iniciar_paseo` | Apaga ambas TVs, arranca `timer.paseo` (30 min) y notifica; lo dispara `modo_paseo_inicio` |
 
 ## Automatizaciones
 
@@ -80,10 +88,14 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 |---|---|
 | `tv_living_wol` | Hook `webostv.turn_on` → WoL (el LG en deep-off no responde por webOS) |
 | `house_mode_llegada` | iPhone → home ⇒ HOME + notificación. Fase 2: sumar confirmación por puerta |
-| `house_mode_salida` | not_home 5 min ⇒ AWAY + apagar TVs + notificación. Respeta CLEANING. Fase 2: sumar mmWave |
+| `house_mode_salida` | not_home 5 min ⇒ AWAY + apagar TVs + notificación. Respeta CLEANING **y modo_paseo** (no dispara si estás paseando). Fase 2: sumar mmWave |
 | `house_mode_noche_provisional` | 23:30 en casa ⇒ NIGHT. Fase 2: presencia real en dormitorio |
 | `house_mode_manana` | 07:00 si NIGHT ⇒ HOME |
 | `webhook_flow_sala` / `_netflix_sala` / `_youtube_sala` | POST sin auth (IDs aleatorios = secreto) para Atajos iOS; solo alcanzables desde la tailnet |
+| `despertar_suave` | 08:30 L-V estando en casa → TV dormitorio en Flow canal 14 |
+| `modo_paseo_inicio` / `modo_paseo_fin` | Paseo del perro: apaga TVs + timer 30 min; suspende AWAY; se cierra por timer o al volver a home |
+| `aviso_tv_prendida_sin_nadie` / `aviso_tv_accion_apagar` | Estando AWAY con TV encendida 2 min → notif accionable (long-press muestra "Apagar"); `not modo_simulacion` |
+| `simulacion_toggle_tv_living` / `simulacion_apagar_a_las_23_30` | Modo simulación + AWAY, 19-23:30: togglea el LG al azar (50% cada 30 min); apaga a las 23:30 |
 
 ## Control desde el iPhone
 
