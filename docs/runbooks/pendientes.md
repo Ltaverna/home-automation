@@ -24,13 +24,17 @@
   - HECHO 2026-09-26: capa local — integración `mcp_server` activa (API assist), 13 entidades
     expuestas a Assist, endpoint `/mcp_server/sse` verificado (bearer token). Alcanzable por
     LAN/Tailscale.
-  - PENDIENTE: exposición a internet para clientes en la nube (ChatGPT/Claude web). Reabre la
-    decisión de exponer HA. Arquitectura elegida a definir:
-    - A (recomendada): mcp_server nativo + **Cloudflare Tunnel** (subdominio de neuralcore.dev)
-      + **Access service token** para proteger. Requiere: login de `cloudflared` (interactivo),
-      external_url + trusted_proxies del túnel en HA, y conectar el connector en Claude.ai
-      (plan Pro/Max) / ChatGPT con la URL + headers.
-    - B: integración community `ha-mcp` (HACS) con túnel propio outbound-only.
+  - HECHO 2026-09-26: exposición a internet resuelta con **HA-MCP** (`ha_mcp_tools` 8.5.0):
+    - El `mcp_server` nativo NO sirve para ChatGPT (solo SSE legacy). Se migró a `ha_mcp_tools`
+      (streamable HTTP + OAuth/DCR), compatible con ChatGPT y Claude.
+    - Túnel Cloudflare dedicado `ha-mcp.neuralcore.dev` → `:9584` (contenedor `cloudflared-mcp`
+      en docker-compose, credentials en `cloudflared/ha-mcp.json` fuera de git).
+    - Connector: URL = `https://ha-mcp.neuralcore.dev` + secret_path (credencial, en la config
+      entry / backup), auth "sin autenticación" (el secret_path es la credencial).
+    - PENDIENTE: conectar y probar el connector en ChatGPT y Claude (el usuario).
+    - Nota seguridad: el secret_path da acceso directo a la casa. Rotar con
+      `regenerate_secrets` en el options flow si se filtra. Evaluar pasar a OAuth `ha_auth` puro
+      más adelante si se quiere login en vez de secreto en URL.
 
 ## Proyectos futuros
 - **Reporte diario** de ocupación/uso (resumen a las 23h). Baja prioridad.

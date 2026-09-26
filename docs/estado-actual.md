@@ -40,7 +40,8 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | HACS | instalado, **sin configurar** | login GitHub pendiente; gestiona `samsungtv_smart` |
 | Bluetooth | adaptador interno R2130 | disponible para BLE futuro |
 | Tailscale (host, no HA) | `tailscale serve` → 8123 | `https://r2130.tail71f19f.ts.net` |
-| MCP Server (`mcp_server`, nativo) | API "assist", endpoint `/mcp_server/sse` | Expone las entidades de Assist a clientes MCP (Claude/ChatGPT). 13 entidades expuestas (TVs, switches, house_mode, modos, timer, person). Local/Tailscale funciona; **falta exposición a internet** para clientes en la nube |
+| MCP Server (`mcp_server`, nativo) | API "assist", endpoint `/mcp_server/sse` | Solo transporte SSE legacy → **incompatible con ChatGPT** (exige streamable HTTP). Sigue activo pero SIN uso; el túnel ya no lo apunta. Sirve por LAN/Tailscale para clientes que toleren SSE |
+| **HA-MCP** (HACS `ha_mcp_tools` 8.5.0) | puerto **9584**, secret_path | El MCP en uso para la nube. Streamable HTTP moderno (protocolo 2025-06-18) + OAuth/DCR → compatible con ChatGPT **y** Claude. Expuesto por el túnel `ha-mcp.neuralcore.dev` → `:9584`. Credencial = **secret_path** aleatorio (modo `webhook_auth: ha_auth` configurado, pero el secret_path da acceso directo). La URL con el secret_path es una credencial → NO va a git (está en la config entry / backup). `llm_api_exposure: both` |
 
 ## Entidades y helpers clave
 
