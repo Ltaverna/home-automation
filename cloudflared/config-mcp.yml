@@ -5,6 +5,8 @@ tunnel: 1b0296d2-f1c4-4120-904c-24f2bba7c94e
 credentials-file: /etc/cloudflared/ha-mcp.json
 
 ingress:
+  # Apunta al servidor ha-mcp (custom component, puerto 9584), no al HA nativo.
+  # ha-mcp da OAuth/DCR + streamable HTTP → compatible con Claude.ai y ChatGPT.
   - hostname: ha-mcp.neuralcore.dev
-    service: http://localhost:8123
+    service: http://localhost:9584
   - service: http_status:404
