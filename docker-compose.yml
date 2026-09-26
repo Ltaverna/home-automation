@@ -39,6 +39,7 @@ services:
     container_name: cloudflared-mcp
     restart: unless-stopped
     network_mode: host
+    user: "1000:1000"   # uid de pi, dueño de cloudflared/ha-mcp.json (mantiene 600)
     command: tunnel --no-autoupdate --config /etc/cloudflared/config-mcp.yml run
     volumes:
       - ./cloudflared:/etc/cloudflared:ro
