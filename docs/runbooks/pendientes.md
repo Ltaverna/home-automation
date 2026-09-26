@@ -18,12 +18,21 @@
 - **Fase 4**: verificar HailoRT del host == 4.21.0 (lo que exige Frigate 0.16); si no,
   script oficial `user_installation.sh` de Frigate, NO el paquete apt.
 
-## Proyectos futuros
+## En progreso
 
-- **Servidor MCP de Home Assistant** (controlar la casa desde Claude/ChatGPT): HA ya trae la
-  integración oficial "Model Context Protocol Server" que expone Assist a clientes MCP. No hay
-  que construir nada de cero — activar la integración + conectar el cliente. Requiere Assist
-  bien configurado (mejora con el Voice PE / Fase 5). Proyecto aparte con su propia spec.
+- **MCP Server** (controlar la casa desde Claude/ChatGPT):
+  - HECHO 2026-09-26: capa local — integración `mcp_server` activa (API assist), 13 entidades
+    expuestas a Assist, endpoint `/mcp_server/sse` verificado (bearer token). Alcanzable por
+    LAN/Tailscale.
+  - PENDIENTE: exposición a internet para clientes en la nube (ChatGPT/Claude web). Reabre la
+    decisión de exponer HA. Arquitectura elegida a definir:
+    - A (recomendada): mcp_server nativo + **Cloudflare Tunnel** (subdominio de neuralcore.dev)
+      + **Access service token** para proteger. Requiere: login de `cloudflared` (interactivo),
+      external_url + trusted_proxies del túnel en HA, y conectar el connector en Claude.ai
+      (plan Pro/Max) / ChatGPT con la URL + headers.
+    - B: integración community `ha-mcp` (HACS) con túnel propio outbound-only.
+
+## Proyectos futuros
 - **Reporte diario** de ocupación/uso (resumen a las 23h). Baja prioridad.
 
 ## Decisiones registradas

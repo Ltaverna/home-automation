@@ -40,6 +40,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | HACS | instalado, **sin configurar** | login GitHub pendiente; gestiona `samsungtv_smart` |
 | Bluetooth | adaptador interno R2130 | disponible para BLE futuro |
 | Tailscale (host, no HA) | `tailscale serve` → 8123 | `https://r2130.tail71f19f.ts.net` |
+| MCP Server (`mcp_server`, nativo) | API "assist", endpoint `/mcp_server/sse` | Expone las entidades de Assist a clientes MCP (Claude/ChatGPT). 13 entidades expuestas (TVs, switches, house_mode, modos, timer, person). Local/Tailscale funciona; **falta exposición a internet** para clientes en la nube |
 
 ## Entidades y helpers clave
 
