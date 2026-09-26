@@ -1,0 +1,10 @@
+# Túnel dedicado para el endpoint MCP de Home Assistant.
+# Solo expone ha-mcp.neuralcore.dev → HA local. El resto responde 404.
+# credentials-file (ha-mcp.json) es secreto y NO está en git — se copia a mano en la R2130.
+tunnel: 1b0296d2-f1c4-4120-904c-24f2bba7c94e
+credentials-file: /etc/cloudflared/ha-mcp.json
+
+ingress:
+  - hostname: ha-mcp.neuralcore.dev
+    service: http://localhost:8123
+  - service: http_status:404

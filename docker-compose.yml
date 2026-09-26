@@ -30,3 +30,17 @@ services:
       - TZ=${TZ}
     depends_on:
       - mosquitto
+
+  # Túnel dedicado Cloudflare para exponer el endpoint MCP a clientes en la nube.
+  # Aislado de los otros túneles de la R2130 (helmet-detection/consorcio/crypto-bot).
+  # credentials (cloudflared/ha-mcp.json) fuera de git; config sin secretos.
+  cloudflared-mcp:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-mcp
+    restart: unless-stopped
+    network_mode: host
+    command: tunnel --no-autoupdate --config /etc/cloudflared/config-mcp.yml run
+    volumes:
+      - ./cloudflared:/etc/cloudflared:ro
+    depends_on:
+      - homeassistant

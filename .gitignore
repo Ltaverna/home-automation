@@ -8,6 +8,9 @@ mosquitto/config/passwd
 # Código de terceros gestionado por HACS (cubierto por el backup nocturno)
 homeassistant/custom_components/
 
+# Credenciales de túneles Cloudflare (secreto; en el backup nocturno)
+cloudflared/*.json
+
 # Estado de runtime (no config)
 homeassistant/.storage/
 homeassistant/home-assistant.log*
