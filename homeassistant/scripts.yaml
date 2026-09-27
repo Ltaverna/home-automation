@@ -33,8 +33,10 @@ flow_canal:
       required: false
       example: "telefe"
   variables:
-    # Grilla Flow AMBA (guía oficial de Personal Flow). Claves en minúsculas sin espacios;
-    # el lookup normaliza con lower() + replace(' ',''). Incluye alias comunes.
+    # Grilla Flow AMBA. Claves en minúsculas sin espacios; el lookup normaliza con
+    # lower() + replace(' ',''). Incluye alias comunes.
+    # OJO: la grilla web NO coincide 100% con el decodificador (LN+/A24 estaban cruzados).
+    # Se corrige contra la TV real a medida que se usa. Validados en vivo: tn=14, lanacion=15, a24=19.
     grilla:
       # Aire / noticias
       somosamba: 7
