@@ -357,3 +357,22 @@ views:
           - switch.youtube_dormitorio
       - type: media-control
         entity: media_player.tv_dormitorio
+
+  - title: Salud
+    path: salud
+    icon: mdi:heart-pulse
+    cards:
+      - type: entities
+        title: Estado de servicios
+        entities:
+          - entity: binary_sensor.salud_home_assistant
+            name: Home Assistant
+          - entity: binary_sensor.salud_face_embed
+            name: FaceEmbed API
+          - entity: binary_sensor.salud_mcp
+            name: MCP (ha-mcp)
+      - type: markdown
+        content: >
+          **OK** = servicio respondiendo · **Problema** = no responde.
+          `face-recognizer` está pausado a propósito (no se monitorea). El core
+          (HA/MQTT/Raspi/internet) lo cubre el watchdog externo de healthchecks.io.
