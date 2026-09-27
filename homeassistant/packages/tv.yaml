@@ -86,7 +86,7 @@ template:
 # Token en secrets.yaml (fuera de git). Teclas/power/dígitos siguen locales.
 rest_command:
   st_tv_dormitorio_app:
-    url: "https://api.smartthings.com/v1/devices/bf18b0f0-0a56-6be5-a574-26ef4efdb123/commands"
+    url: !secret st_url
     method: post
     headers:
       Authorization: !secret st_bearer
@@ -100,7 +100,7 @@ script:
     sequence:
       - action: wake_on_lan.send_magic_packet
         data:
-          mac: "38:06:E6:1C:26:70"
+          mac: !secret lg_mac
 
   tv_dormitorio_encender:
     alias: "Encender TV dormitorio (WoL)"
@@ -108,7 +108,7 @@ script:
     sequence:
       - action: wake_on_lan.send_magic_packet
         data:
-          mac: "68:72:C3:80:C4:A8"
+          mac: !secret samsung_mac
 
   flow_canal:
     alias: "Flow: poner canal (living)"
