@@ -60,7 +60,7 @@ Los secretos viven en `.env`, `mosquitto/config/passwd` y `homeassistant/secrets
 │   ├── automations.yaml / scripts.yaml → vacíos ([]/{}); todo migró a packages, se mantiene el !include
 │   ├── scenes.yaml
 │   ├── dashboards/remoto.yaml → dashboard "Control remoto" (d-pad, dígitos, apps, 2 TVs, Salud)
-│   ├── secrets.yaml          → token SmartThings (NO va a git)
+│   ├── secrets.yaml          → st_bearer, st_url, lg_mac, samsung_mac (NO va a git; ver secrets.yaml.example)
 │   └── custom_components/    → HACS + samsungtv_smart + ha_mcp_tools (NO va a git; en backup)
 ├── healthmon/ face-embed/ face-recognizer/ cloudflared/  → contenedores propios (Dockerfile)
 ├── mosquitto/config/mosquitto.conf
@@ -91,9 +91,17 @@ TOKEN=$(cat ~/.ha_token); H="Authorization: Bearer $TOKEN"; BASE=http://192.168.
 curl -X POST -H "$H" $BASE/services/automation/reload   # automations.yaml
 curl -X POST -H "$H" $BASE/services/script/reload       # scripts.yaml
 curl -X POST -H "$H" $BASE/services/template/reload     # template switches
-# configuration.yaml (http, homekit, input_select nuevos) → restart:
+# configuration.yaml / packages/ nuevos (helpers, homekit) → restart:
 ssh r2130 'docker restart homeassistant'
 ```
+
+**Perfiles de servicios:** `COMPOSE_PROFILES` en `.env` decide qué levanta cada casa
+(`face` = face-embed + face-recognizer, requieren Hailo/cámara · `obs` = healthmon). La base
+(mosquitto, homeassistant, cloudflared-mcp) siempre. Casa principal: `face,obs`.
+
+**Instalar en otra casa:** ver [`docs/runbooks/onboarding-casa-nueva.md`](docs/runbooks/onboarding-casa-nueva.md).
+El repo aporta la lógica (packages, scripts, compose); cada casa su contexto (`.env`, `secrets.yaml`,
+`.storage`, túnel Cloudflare).
 
 La R2130 tiene deploy key **read-only**: nunca commitea, solo pullea.
 

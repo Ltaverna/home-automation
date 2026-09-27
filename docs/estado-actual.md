@@ -127,6 +127,9 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 - Token API HA: `~/.ha_token` en el mini-PC
 - `.env` + `mosquitto/config/passwd` + `homeassistant/.storage`: solo en la R2130 y en el backup nocturno (`/opt/backups/home-automation/`, 04:30, retiene 14)
 - Deploy key GitHub read-only en la R2130
+- `homeassistant/secrets.yaml` (fuera de git): `st_bearer`, `st_url`, `lg_mac`, `samsung_mac`.
+  Plantilla versionada en `secrets.yaml.example`. Los packages los usan con `!secret`.
+- `COMPOSE_PROFILES` en `.env` (casa principal: `face,obs`) — define qué servicios levantan.
 
 ## Pendientes
 

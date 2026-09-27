@@ -24,8 +24,10 @@
   (tv, house_mode, paseo, seguridad, face, salud). `automations.yaml`/`scripts.yaml` vacíos
   ([]/{}), se mantiene el !include. Verificado: mismo conjunto de entidades pre/post refactor.
   Fase 2 ahora suma un package (ej. `presencia.yaml`) en vez de engordar los monolitos.
-- PENDIENTE: **Parametrización** — valores casa-específicos (IPs, MACs, IDs Tizen, secret_path,
-  grilla) a `secrets.yaml` + compose profiles + doc onboarding. Ahora sobre la base modular.
+- HECHO 2026-09-28: **Parametrización** — MACs (`lg_mac`/`samsung_mac`) y URL SmartThings (`st_url`)
+  a `secrets.yaml` (+ `secrets.yaml.example`); compose profiles (`face`/`obs`) con `COMPOSE_PROFILES`
+  en `.env`; doc `onboarding-casa-nueva.md`. entity_ids/IDs Tizen/grilla se cubren por convención +
+  onboarding (HA no los parametriza). **✅ Refactor de arquitectura COMPLETO (los 3 sub-proyectos).**
 
 ## En progreso
 

@@ -17,8 +17,10 @@
    `sudo tar -xzf config-<fecha>.tar.gz -C /opt`
    Sin backup, recrear a mano:
    - `.env` desde `.env.example` + passwd con `mosquitto_passwd`
-   - `homeassistant/secrets.yaml`: `st_bearer: "Bearer <token SmartThings>"` (regenerar
-     en account.smartthings.com/tokens, scopes Devices)
+   - `homeassistant/secrets.yaml`: completar desde `secrets.yaml.example`
+     (`st_bearer`, `st_url`, `lg_mac`, `samsung_mac`; el token se regenera en
+     account.smartthings.com/tokens, scopes Devices)
+   - Para una casa NUEVA (no recovery), seguir `onboarding-casa-nueva.md`.
    - custom_components: HACS (`wget -O - https://get.hacs.xyz | bash -` dentro del
      contenedor) + `samsungtv_smart` (release zip de ollo69/ha-samsungtv-smart)
 6. Permisos mosquitto: `sudo chown 1883:1883 mosquitto/config/passwd mosquitto/data mosquitto/log && sudo chmod 600 mosquitto/config/passwd`
