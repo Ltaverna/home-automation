@@ -312,3 +312,61 @@
       target:
         entity_id: media_player.lg_webos_tv_oled55c3psa
       continue_on_error: true
+
+- id: face_reconocido
+  alias: "Face: notificar reconocimiento"
+  description: "Notifica al iPhone cuando cambia quién ve la cámara (transición real, no 'nadie')."
+  triggers:
+    - trigger: state
+      entity_id: sensor.ultima_cara
+  conditions:
+    - condition: template
+      value_template: >
+        {{ trigger.from_state.state != trigger.to_state.state
+           and trigger.to_state.state not in ['nadie', 'unknown', 'unavailable', ''] }}
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'desconocido' }}"
+          sequence:
+            - action: notify.mobile_app_lucass_iphone
+              data:
+                title: "⚠️ Cara desconocida"
+                message: "La cámara detectó una cara no reconocida."
+      default:
+        - action: notify.mobile_app_lucass_iphone
+          data:
+            title: "👋 Reconocido"
+            message: "La cámara reconoció a {{ trigger.to_state.state }}."
+
+- id: face_lucas_presencia
+  alias: "Face: señal blanda de presencia de Lucas"
+  description: "Prende lucas_visto_camara al reconocer a Lucas; lo apaga tras 3 min sin verlo."
+  triggers:
+    - trigger: state
+      entity_id: sensor.ultima_cara
+      to: "lucas"
+      id: visto
+    - trigger: state
+      entity_id: sensor.ultima_cara
+      for: "00:03:00"
+      id: ausente
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: visto
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.lucas_visto_camara
+        - conditions:
+            - condition: trigger
+              id: ausente
+            - condition: template
+              value_template: "{{ not is_state('sensor.ultima_cara', 'lucas') }}"
+          sequence:
+            - action: input_boolean.turn_off
+              target:
+                entity_id: input_boolean.lucas_visto_camara

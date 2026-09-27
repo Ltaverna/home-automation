@@ -41,6 +41,9 @@ input_boolean:
   modo_simulacion:
     name: Modo simulación (anti-robo)
     icon: mdi:shield-home
+  lucas_visto_camara:
+    name: Lucas visto por cámara
+    icon: mdi:face-recognition
 
 timer:
   paseo:
