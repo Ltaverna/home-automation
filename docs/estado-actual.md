@@ -71,7 +71,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | `tv_living_encender` | Magic packet WoL al LG |
 | `tv_app` (param `app`) | Enciende si hace falta, espera boot, abre la app por nombre del `source_list` |
 | `flow_sala` / `netflix_sala` / `youtube_sala` | Atajos sin parámetros sobre `tv_app` |
-| `flow_canal` (param `canal` o `nombre`) | Abre Flow si no está activo y zapea con dígitos + ENTER. Acepta número o nombre de la grilla nombre→número del propio script (**incompleta: solo telefe=10, falta que Lucas dicte la suya**) |
+| `flow_canal` (param `canal` o `nombre`) | Abre Flow y zapea con dígitos + ENTER. Acepta número (`canal: 14`) o nombre (`nombre: tn`). **Grilla Flow AMBA cargada (~55 canales + alias); validado en vivo (LG acepta dígitos con Flow reproduciendo, no necesita ir a la Guía)** |
 
 ### Dormitorio (Samsung)
 

@@ -6,8 +6,9 @@
 
 - **Reservar IPs en el DHCP del router**: 192.168.1.17 (R2130), 192.168.1.14 (LG),
   192.168.1.16 (Samsung).
-- **Cargar la grilla Flow** nombre→número en `script.flow_canal` (Lucas la dicta desde la
-  guía; hoy solo tiene `telefe: 10`).
+- ~~Cargar la grilla Flow~~ HECHO 2026-09-28: grilla AMBA completa (~55 canales + alias) en
+  `flow_canal`, validada en vivo en el LG. El `flow_canal_dormitorio` (Samsung) navega a la
+  Guía; el del living no lo necesita.
 - **Activar Quick Start+ en el LG**: hoy al apagarse queda `unavailable` (deep-off). El WoL
   la enciende igual, pero con Quick Start+ quedaría visible en standby y el estado sería
   más prolijo.
