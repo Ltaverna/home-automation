@@ -31,6 +31,21 @@ services:
     depends_on:
       - mosquitto
 
+  # FaceEmbed API (reconocimiento facial en Hailo-8, proyecto experimental).
+  # HailoRT 4.20 en el contenedor + /dev/hailo0 del host. DB SQLite en volumen.
+  face-embed:
+    build: ./face-embed
+    container_name: face-embed
+    restart: unless-stopped
+    devices:
+      - /dev/hailo0:/dev/hailo0
+    volumes:
+      - ./face-embed/data:/app/data
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=${TZ}
+
   # Túnel dedicado Cloudflare para exponer el endpoint MCP a clientes en la nube.
   # Aislado de los otros túneles de la R2130 (helmet-detection/consorcio/crypto-bot).
   # credentials (cloudflared/ha-mcp.json) fuera de git; config sin secretos.
