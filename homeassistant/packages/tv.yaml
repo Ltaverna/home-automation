@@ -1,0 +1,478 @@
+# Package TV: control de las dos TVs (LG webOS + Samsung Tizen), apps y canales Flow.
+
+# WoL para encender las TVs (LG 38:06:E6:1C:26:70, Samsung 68:72:C3:80:C4:A8)
+wake_on_lan:
+
+# Switches que envuelven scripts, porque las acciones de Atajos de iOS
+# (App Intents) solo listan ciertos dominios y los scripts no aparecen.
+# ON = abrir app (enciende TV por WoL si hace falta) / OFF = apagar TV.
+template:
+  - switch:
+      - name: "Flow sala"
+        unique_id: flow_sala_switch
+        icon: mdi:television-play
+        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'Flow') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.flow_sala
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+      - name: "Netflix sala"
+        unique_id: netflix_sala_switch
+        icon: mdi:netflix
+        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'Netflix') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.netflix_sala
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+      - name: "YouTube sala"
+        unique_id: youtube_sala_switch
+        icon: mdi:youtube
+        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'YouTube') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.youtube_sala
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+      - name: "Flow dormitorio"
+        unique_id: flow_dormitorio_switch
+        icon: mdi:television-play
+        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', 'fCCrJTSe28.Flow') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.flow_dormitorio
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.tv_dormitorio
+      - name: "Netflix dormitorio"
+        unique_id: netflix_dormitorio_switch
+        icon: mdi:netflix
+        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', 'org.tizen.netflix-app') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.netflix_dormitorio
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.tv_dormitorio
+      - name: "YouTube dormitorio"
+        unique_id: youtube_dormitorio_switch
+        icon: mdi:youtube
+        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', '9Ur5IzDKqV.TizenYouTube') }}"
+        turn_on:
+          - action: script.turn_on
+            target:
+              entity_id: script.youtube_dormitorio
+        turn_off:
+          - action: media_player.turn_off
+            target:
+              entity_id: media_player.tv_dormitorio
+
+# Lanzamiento de apps en el Samsung Q60T: Samsung capó el canal local (ws) en
+# modelos 2020+; el único método que funciona es la API cloud de SmartThings.
+# Token en secrets.yaml (fuera de git). Teclas/power/dígitos siguen locales.
+rest_command:
+  st_tv_dormitorio_app:
+    url: "https://api.smartthings.com/v1/devices/bf18b0f0-0a56-6be5-a574-26ef4efdb123/commands"
+    method: post
+    headers:
+      Authorization: !secret st_bearer
+    content_type: "application/json"
+    payload: '{"commands":[{"component":"main","capability":"custom.launchapp","command":"launchApp","arguments":["{{ app_id }}"]}]}'
+
+script:
+  tv_living_encender:
+    alias: "Encender TV living (WoL)"
+    icon: mdi:television
+    sequence:
+      - action: wake_on_lan.send_magic_packet
+        data:
+          mac: "38:06:E6:1C:26:70"
+
+  tv_dormitorio_encender:
+    alias: "Encender TV dormitorio (WoL)"
+    icon: mdi:television
+    sequence:
+      - action: wake_on_lan.send_magic_packet
+        data:
+          mac: "68:72:C3:80:C4:A8"
+
+  flow_canal:
+    alias: "Flow: poner canal (living)"
+    icon: mdi:television-guide
+    description: >
+      Abre Flow si no está activo y zapea al canal indicado mandando los dígitos
+      + ENTER. Acepta número (canal: 24) o nombre de la grilla (nombre: telefe).
+      Los dígitos solo actúan si Flow está reproduciendo TV en vivo (no en el menú).
+    fields:
+      canal:
+        name: Canal
+        description: "Número de canal de Flow (ej. 24)"
+        required: false
+        example: 24
+      nombre:
+        name: Nombre
+        description: "Nombre del canal según la grilla (ej. telefe)"
+        required: false
+        example: "telefe"
+    variables:
+      # Grilla Flow AMBA. Claves en minúsculas sin espacios; el lookup normaliza con
+      # lower() + replace(' ',''). Incluye alias comunes.
+      # OJO: la grilla web NO coincide 100% con el decodificador (LN+/A24 estaban cruzados).
+      # Se corrige contra la TV real a medida que se usa. Validados en vivo: tn=14, lanacion=15, a24=19.
+      grilla:
+        # Aire / noticias
+        somosamba: 7
+        metro: 8
+        america: 9
+        telefe: 10
+        tvpublica: 11
+        publica: 11
+        eltrece: 12
+        trece: 12
+        elnueve: 13
+        nueve: 13
+        tn: 14
+        a24: 19
+        c5n: 16
+        cronica: 17
+        canal26: 18
+        lanacion: 15
+        lnmas: 15
+        ciudadmagazine: 20
+        nettv: 21
+        cnn: 22
+        cnnenespañol: 22
+        ip: 23
+        bravo: 24
+        kzo: 25
+        # Deportes
+        tycsports: 101
+        tyc: 101
+        espn2: 102
+        espn: 103
+        espn3: 104
+        espn4: 105
+        foxsports: 106
+        foxsports2: 107
+        foxsports3: 108
+        dsports: 109
+        dsports2: 110
+        nbatv: 111
+        espnpremium: 123
+        tntsports: 124
+        # Infantiles
+        disney: 201
+        disneychannel: 201
+        nickelodeon: 202
+        cartoonnetwork: 203
+        discoverykids: 205
+        disneyjr: 207
+        # Cine y series
+        cinemax: 301
+        volver: 303
+        space: 304
+        cinecanal: 305
+        tnt: 306
+        tntseries: 307
+        fx: 308
+        starchannel: 309
+        star: 309
+        sony: 310
+        warner: 311
+        warnerchannel: 311
+        universal: 312
+        axn: 313
+        ae: 315
+        tcm: 318
+        amc: 319
+        golden: 322
+        comedycentral: 326
+        paramount: 327
+        telemundo: 331
+        # Estilo de vida / docs
+        elgourmet: 401
+        foodnetwork: 403
+        tlc: 407
+        natgeo: 450
+        nationalgeographic: 450
+        discovery: 451
+        animalplanet: 452
+        history: 454
+        history2: 458
+      canal_num: >-
+        {% if canal is defined and canal | string | trim != '' %}
+          {{ canal }}
+        {% else %}
+          {{ grilla.get(nombre | default('') | lower | replace(' ', ''), 0) }}
+        {% endif %}
+    sequence:
+      - condition: template
+        value_template: "{{ canal_num | int(0) > 0 }}"
+      - if:
+          - condition: template
+            value_template: >
+              {{ state_attr('media_player.lg_webos_tv_oled55c3psa', 'source') != 'Flow' }}
+        then:
+          - action: media_player.select_source
+            target:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+            data:
+              source: "Flow"
+          - delay: "00:00:12"
+      - repeat:
+          for_each: "{{ canal_num | string | trim | list }}"
+          sequence:
+            - action: webostv.button
+              data:
+                entity_id: media_player.lg_webos_tv_oled55c3psa
+                button: "{{ repeat.item }}"
+            - delay:
+                milliseconds: 400
+      - action: webostv.button
+        data:
+          entity_id: media_player.lg_webos_tv_oled55c3psa
+          button: "ENTER"
+
+  flow_sala:
+    alias: "Flow en la sala"
+    icon: mdi:television-play
+    description: "Enciende la TV del living si hace falta y abre Flow. Pensado para Siri/Assist."
+    sequence:
+      - action: script.tv_app
+        data:
+          app: "Flow"
+
+  netflix_sala:
+    alias: "Netflix en la sala"
+    icon: mdi:netflix
+    description: "Enciende la TV del living si hace falta y abre Netflix. Pensado para Siri/Assist."
+    sequence:
+      - action: script.tv_app
+        data:
+          app: "Netflix"
+
+  youtube_sala:
+    alias: "YouTube en la sala"
+    icon: mdi:youtube
+    description: "Enciende la TV del living si hace falta y abre YouTube. Pensado para Siri/Assist."
+    sequence:
+      - action: script.tv_app
+        data:
+          app: "YouTube"
+
+  tv_app_dormitorio:
+    alias: "TV dormitorio: abrir app"
+    icon: mdi:apps
+    description: >
+      Lanza una app en el Samsung por su ID Tizen (capturados empíricamente vía
+      SmartThings): Flow=fCCrJTSe28.Flow, Netflix=org.tizen.netflix-app,
+      YouTube=9Ur5IzDKqV.TizenYouTube. Enciende la TV por WoL si hace falta.
+    fields:
+      app_id:
+        name: App ID
+        description: "ID Tizen de la app"
+        required: true
+        example: "fCCrJTSe28.Flow"
+    sequence:
+      - if:
+          - condition: template
+            value_template: "{{ states('media_player.tv_dormitorio') in ('off', 'unavailable') }}"
+        then:
+          - action: script.tv_dormitorio_encender
+          - wait_template: "{{ states('media_player.tv_dormitorio') not in ('off', 'unavailable') }}"
+            timeout: "00:00:40"
+      - action: rest_command.st_tv_dormitorio_app
+        data:
+          app_id: "{{ app_id }}"
+
+  flow_dormitorio:
+    alias: "Flow en el dormitorio"
+    icon: mdi:television-play
+    sequence:
+      - action: script.tv_app_dormitorio
+        data:
+          app_id: "fCCrJTSe28.Flow"
+
+  netflix_dormitorio:
+    alias: "Netflix en el dormitorio"
+    icon: mdi:netflix
+    sequence:
+      - action: script.tv_app_dormitorio
+        data:
+          app_id: "org.tizen.netflix-app"
+
+  youtube_dormitorio:
+    alias: "YouTube en el dormitorio"
+    icon: mdi:youtube
+    sequence:
+      - action: script.tv_app_dormitorio
+        data:
+          app_id: "9Ur5IzDKqV.TizenYouTube"
+
+  flow_canal_dormitorio:
+    alias: "Flow: poner canal (dormitorio)"
+    icon: mdi:television-guide
+    description: >
+      Abre Flow desde cero (enciende la TV si hace falta), navega a la Guía de
+      Flow (abajo, abajo, derecha, ENTER) y tipea el número de canal + ENTER.
+      Ruta mapeada empíricamente en la app Flow del Samsung Q60T.
+    fields:
+      canal:
+        name: Canal
+        description: "Número de canal de Flow (ej. 14)"
+        required: true
+        example: 14
+    sequence:
+      # Abrir Flow para partir del home conocido (enciende la TV por WoL si hace falta)
+      - action: script.flow_dormitorio
+      - delay: "00:00:18"          # esperar que cargue el home de Flow
+      # Navegar a la Guía: abajo, abajo, derecha, ENTER (2 s entre teclas)
+      - repeat:
+          for_each: ["KEY_DOWN", "KEY_DOWN", "KEY_RIGHT", "KEY_ENTER"]
+          sequence:
+            - action: remote.send_command
+              target:
+                entity_id: remote.tv_dormitorio
+              data:
+                command: "{{ repeat.item }}"
+            - delay:
+                seconds: 2
+      - delay: "00:00:02"          # que termine de abrir la Guía
+      # Tipear el número de canal (dígitos rápidos) + ENTER
+      - repeat:
+          for_each: "{{ canal | string | trim | list }}"
+          sequence:
+            - action: remote.send_command
+              target:
+                entity_id: remote.tv_dormitorio
+              data:
+                command: "KEY_{{ repeat.item }}"
+            - delay:
+                milliseconds: 300
+      - delay: "00:00:01"
+      - action: remote.send_command
+        target:
+          entity_id: remote.tv_dormitorio
+        data:
+          command: "KEY_ENTER"
+
+  tv_app:
+    alias: "TV living: abrir app"
+    icon: mdi:apps
+    description: >
+      Abre una app en el LG por nombre exacto del source_list:
+      YouTube, Netflix, MUBI, Disney+, HBO Max, Prime Video, Spotify – Música y
+      podcasts, Plex, Apple TV, Flow, TV en Vivo, etc. Si la TV está apagada,
+      la despierta por WoL primero.
+    fields:
+      app:
+        name: App
+        description: "Nombre exacto de la app (ver source_list)"
+        required: true
+        example: "Netflix"
+    sequence:
+      - if:
+          - condition: template
+            value_template: "{{ states('media_player.lg_webos_tv_oled55c3psa') in ('off', 'unavailable') }}"
+        then:
+          - action: script.tv_living_encender
+          - wait_template: "{{ states('media_player.lg_webos_tv_oled55c3psa') not in ('off', 'unavailable') }}"
+            timeout: "00:00:30"
+      - action: media_player.select_source
+        target:
+          entity_id: media_player.lg_webos_tv_oled55c3psa
+        data:
+          source: "{{ app }}"
+
+automation:
+  - id: tv_living_wol
+    alias: "TV living: WoL al pedir encendido"
+    description: "El LG en deep-off no responde por webOS; este hook manda el magic packet."
+    triggers:
+      - trigger: webostv.turn_on
+        entity_id: media_player.lg_webos_tv_oled55c3psa
+    actions:
+      - action: script.tv_living_encender
+
+  - id: webhook_flow_sala
+    alias: "Webhook: Flow en la sala"
+    description: "Para Atajos de iOS sin token: POST a /api/webhook/<id>."
+    triggers:
+      - trigger: webhook
+        webhook_id: "goNLDUqlSbHTZ4WeFJDKmEIEvaiPivGM"
+        allowed_methods: [POST]
+        local_only: false
+    actions:
+      - action: script.turn_on
+        target:
+          entity_id: script.flow_sala
+
+  - id: webhook_netflix_sala
+    alias: "Webhook: Netflix en la sala"
+    triggers:
+      - trigger: webhook
+        webhook_id: "iCFqYRj70mMMIeR7MRhUbECHmyTAT_HF"
+        allowed_methods: [POST]
+        local_only: false
+    actions:
+      - action: script.turn_on
+        target:
+          entity_id: script.netflix_sala
+
+  - id: webhook_youtube_sala
+    alias: "Webhook: YouTube en la sala"
+    triggers:
+      - trigger: webhook
+        webhook_id: "yY6Wsop4_N8EBZy6HJBlcTDYxaHUUXEI"
+        allowed_methods: [POST]
+        local_only: false
+    actions:
+      - action: script.turn_on
+        target:
+          entity_id: script.youtube_sala
+
+  - id: homekit_remote_lg
+    alias: "HomeKit remote → botones LG"
+    description: "Traduce las teclas del control del Centro de Control de iOS a webostv.button."
+    mode: queued
+    triggers:
+      - trigger: event
+        event_type: homekit_tv_remote_key_pressed
+        event_data:
+          entity_id: media_player.lg_webos_tv_oled55c3psa
+    variables:
+      keymap:
+        arrow_up: UP
+        arrow_down: DOWN
+        arrow_left: LEFT
+        arrow_right: RIGHT
+        select: ENTER
+        back: BACK
+        exit: EXIT
+        information: INFO
+    actions:
+      - choose:
+          - conditions: "{{ trigger.event.data.key_name == 'play_pause' }}"
+            sequence:
+              - action: media_player.media_play_pause
+                target:
+                  entity_id: media_player.lg_webos_tv_oled55c3psa
+        default:
+          - action: webostv.button
+            data:
+              entity_id: media_player.lg_webos_tv_oled55c3psa
+              button: "{{ keymap[trigger.event.data.key_name] }}"

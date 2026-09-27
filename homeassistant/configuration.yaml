@@ -1,4 +1,5 @@
 # Config base — Home Assistant genera el resto en .storage/ (fuera de git)
+# La config por feature vive en packages/ (tv, house_mode, paseo, seguridad, face, salud).
 default_config:
 
 # tailscale serve (reverse proxy local) → HTTPS en https://r2130.tail71f19f.ts.net
@@ -17,129 +18,8 @@ homeassistant:
   # external_url = subdominio del túnel Cloudflare para el MCP (clientes en la nube)
   external_url: "https://ha-mcp.neuralcore.dev"
   internal_url: "http://192.168.1.17:8123"
-
-# WoL para encender las TVs (LG 38:06:E6:1C:26:70, Samsung 68:72:C3:80:C4:A8)
-wake_on_lan:
-
-# Estados globales de la casa (spec §house modes). CINEMA es escena, no estado.
-# CLEANING se automatiza en Fase 2+ (necesita sensor de puerta + schedule + mmWave).
-input_select:
-  house_mode:
-    name: Modo de la casa
-    options:
-      - HOME
-      - AWAY
-      - CLEANING
-      - NIGHT
-    icon: mdi:home-account
-
-# Helpers para automatizaciones de software puro (spec 2026-09-20)
-input_boolean:
-  modo_paseo:
-    name: Modo paseo
-    icon: mdi:dog-side
-  modo_simulacion:
-    name: Modo simulación (anti-robo)
-    icon: mdi:shield-home
-  lucas_visto_camara:
-    name: Lucas visto por cámara
-    icon: mdi:face-recognition
-
-timer:
-  paseo:
-    name: Paseo perro
-    duration: "00:30:00"
-    restore: true
-
-# Switches que envuelven scripts, porque las acciones de Atajos de iOS
-# (App Intents) solo listan ciertos dominios y los scripts no aparecen.
-# ON = abrir app (enciende TV por WoL si hace falta) / OFF = apagar TV.
-template:
-  - switch:
-      - name: "Flow sala"
-        unique_id: flow_sala_switch
-        icon: mdi:television-play
-        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'Flow') }}"
-        turn_on:
-          - action: script.turn_on
-            target:
-              entity_id: script.flow_sala
-        turn_off:
-          - action: media_player.turn_off
-            target:
-              entity_id: media_player.lg_webos_tv_oled55c3psa
-      - name: "Netflix sala"
-        unique_id: netflix_sala_switch
-        icon: mdi:netflix
-        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'Netflix') }}"
-        turn_on:
-          - action: script.turn_on
-            target:
-              entity_id: script.netflix_sala
-        turn_off:
-          - action: media_player.turn_off
-            target:
-              entity_id: media_player.lg_webos_tv_oled55c3psa
-      - name: "YouTube sala"
-        unique_id: youtube_sala_switch
-        icon: mdi:youtube
-        state: "{{ is_state_attr('media_player.lg_webos_tv_oled55c3psa', 'source', 'YouTube') }}"
-        turn_on:
-          - action: script.turn_on
-            target:
-              entity_id: script.youtube_sala
-        turn_off:
-          - action: media_player.turn_off
-            target:
-              entity_id: media_player.lg_webos_tv_oled55c3psa
-      - name: "Flow dormitorio"
-        unique_id: flow_dormitorio_switch
-        icon: mdi:television-play
-        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', 'fCCrJTSe28.Flow') }}"
-        turn_on:
-          - action: script.turn_on
-            target:
-              entity_id: script.flow_dormitorio
-        turn_off:
-          - action: media_player.turn_off
-            target:
-              entity_id: media_player.tv_dormitorio
-      - name: "Netflix dormitorio"
-        unique_id: netflix_dormitorio_switch
-        icon: mdi:netflix
-        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', 'org.tizen.netflix-app') }}"
-        turn_on:
-          - action: script.turn_on
-            target:
-              entity_id: script.netflix_dormitorio
-        turn_off:
-          - action: media_player.turn_off
-            target:
-              entity_id: media_player.tv_dormitorio
-      - name: "YouTube dormitorio"
-        unique_id: youtube_dormitorio_switch
-        icon: mdi:youtube
-        state: "{{ is_state_attr('media_player.tv_dormitorio', 'app_id', '9Ur5IzDKqV.TizenYouTube') }}"
-        turn_on:
-          - action: script.turn_on
-            target:
-              entity_id: script.youtube_dormitorio
-        turn_off:
-          - action: media_player.turn_off
-            target:
-              entity_id: media_player.tv_dormitorio
-
-# Lanzamiento de apps en el Samsung Q60T: Samsung capó el canal local (ws) en
-# modelos 2020+; el único método que funciona es la API cloud de SmartThings.
-# Token en secrets.yaml (fuera de git). Teclas/power/dígitos siguen locales.
-rest_command:
-  st_tv_dormitorio_app:
-    url: "https://api.smartthings.com/v1/devices/bf18b0f0-0a56-6be5-a574-26ef4efdb123/commands"
-    method: post
-    headers:
-      Authorization: !secret st_bearer
-    content_type: "application/json"
-    payload: '{"commands":[{"component":"main","capability":"custom.launchapp","command":"launchApp","arguments":["{{ app_id }}"]}]}'
+  # Config modular por feature (cada archivo agrupa automations + scripts + helpers)
+  packages: !include_dir_named packages/
 
 # Dashboard "Control remoto" versionado en git (d-pad de ambas TVs)
 lovelace:
@@ -151,11 +31,8 @@ lovelace:
       show_in_sidebar: true
       filename: dashboards/remoto.yaml
 
-# Puente a Apple Home: Siri nativo para los switches de apps de la sala.
-# El pairing se hace una vez desde la notificación que aparece en HA.
-# Segunda instancia en modo accessory: la TV LG como "HomeKit TV" → habilita
-# el control remoto del Centro de Control de iOS (las teclas llegan como
-# eventos homekit_tv_remote_key_pressed, mapeados en automations.yaml).
+# Puente a Apple Home: Siri nativo para los switches de apps + el remote del LG.
+# Transversal (cruza features tv/paseo/seguridad), por eso queda en el core y no en un package.
 homekit:
   - name: HASS Bridge
     port: 21063
@@ -176,6 +53,8 @@ homekit:
       include_entities:
         - media_player.lg_webos_tv_oled55c3psa
 
+# automations.yaml y scripts.yaml quedaron vacíos: todo migró a packages/.
+# Se mantiene el !include (inocuo) para no dejar HA sin estas keys.
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
