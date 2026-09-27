@@ -36,6 +36,7 @@ services:
   face-embed:
     build: ./face-embed
     container_name: face-embed
+    profiles: ["face"]
     restart: unless-stopped
     devices:
       - /dev/hailo0:/dev/hailo0
@@ -50,6 +51,7 @@ services:
   face-recognizer:
     build: ./face-recognizer
     container_name: face-recognizer
+    profiles: ["face"]
     restart: unless-stopped
     devices:
       - /dev/video0:/dev/video0
@@ -67,6 +69,7 @@ services:
   healthmon:
     build: ./healthmon
     container_name: healthmon
+    profiles: ["obs"]
     restart: unless-stopped
     environment:
       - TZ=${TZ}
