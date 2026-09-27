@@ -33,3 +33,6 @@ mosquitto/log/
 __pycache__/
 *.swp
 .DS_Store
+
+# Credenciales del backup off-site (restic + R2)
+.restic-env

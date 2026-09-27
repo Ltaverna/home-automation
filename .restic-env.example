@@ -1,0 +1,10 @@
+# Copiar a .restic-env (fuera de git, chmod 600) en la R2130 y completar.
+# Repo restic sobre Cloudflare R2 (S3-compatible):
+export RESTIC_REPOSITORY="s3:https://<account_id>.r2.cloudflarestorage.com/<bucket>"
+export AWS_ACCESS_KEY_ID="<r2_access_key_id>"
+export AWS_SECRET_ACCESS_KEY="<r2_secret_access_key>"
+# Password del repo restic — CRÍTICA: guardarla también FUERA del R2130 (gestor de contraseñas).
+# Sin esta password NO se puede restaurar el backup.
+export RESTIC_PASSWORD="<password-repo-restic>"
+# Dead-man switch del backup (healthchecks.io) — opcional:
+export BACKUP_HC_URL=""
