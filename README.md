@@ -54,13 +54,15 @@ Los secretos viven en `.env`, `mosquitto/config/passwd` y `homeassistant/secrets
 ├── docker-compose.yml
 ├── .env.example              → copiar a .env en la R2130
 ├── homeassistant/
-│   ├── configuration.yaml    → base + proxy + input_select + template switches + homekit + rest_command
-│   ├── automations.yaml      → house modes, WoL hook del LG, webhooks iOS, remote HomeKit→LG
-│   ├── scripts.yaml          → encendido TVs, apps (sala y dormitorio), canales Flow
+│   ├── configuration.yaml    → core: default_config, http, homeassistant+packages, homekit, lovelace
+│   ├── packages/             → config por feature (merge automático): tv, house_mode, paseo, seguridad, face, salud
+│   │                           cada archivo agrupa sus automations + scripts + helpers
+│   ├── automations.yaml / scripts.yaml → vacíos ([]/{}); todo migró a packages, se mantiene el !include
 │   ├── scenes.yaml
-│   ├── dashboards/remoto.yaml → dashboard "Control remoto" (d-pad, dígitos, apps, 2 TVs)
+│   ├── dashboards/remoto.yaml → dashboard "Control remoto" (d-pad, dígitos, apps, 2 TVs, Salud)
 │   ├── secrets.yaml          → token SmartThings (NO va a git)
-│   └── custom_components/    → HACS + samsungtv_smart (NO va a git; en backup)
+│   └── custom_components/    → HACS + samsungtv_smart + ha_mcp_tools (NO va a git; en backup)
+├── healthmon/ face-embed/ face-recognizer/ cloudflared/  → contenedores propios (Dockerfile)
 ├── mosquitto/config/mosquitto.conf
 ├── scripts/backup.sh         → cron 04:30 en la R2130 → /opt/backups (retiene 14)
 └── docs/

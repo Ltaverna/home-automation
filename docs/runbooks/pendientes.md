@@ -20,8 +20,12 @@
   watchdog externo healthchecks.io (falta pegar la URL del check).
 - PENDIENTE: **Parametrización** — mover valores casa-específicos (IPs, MACs, IDs Tizen,
   secret_path, grilla) a `secrets.yaml`; compose profiles; doc de onboarding de casa nueva.
-- PENDIENTE: **Modularización** — reorganizar la config de HA en packages (tv, house_mode,
-  face, presencia...) para que Fase 2 sume packages en vez de engordar `automations.yaml`.
+- HECHO 2026-09-28: **Modularización** — config de HA reorganizada en `packages/` por feature
+  (tv, house_mode, paseo, seguridad, face, salud). `automations.yaml`/`scripts.yaml` vacíos
+  ([]/{}), se mantiene el !include. Verificado: mismo conjunto de entidades pre/post refactor.
+  Fase 2 ahora suma un package (ej. `presencia.yaml`) en vez de engordar los monolitos.
+- PENDIENTE: **Parametrización** — valores casa-específicos (IPs, MACs, IDs Tizen, secret_path,
+  grilla) a `secrets.yaml` + compose profiles + doc onboarding. Ahora sobre la base modular.
 
 ## En progreso
 

@@ -66,6 +66,10 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 
 ## Scripts
 
+> Config modularizada (2026-09-28): scripts, automatizaciones y helpers viven en
+> `homeassistant/packages/<feature>.yaml` (tv, house_mode, paseo, seguridad, face, salud).
+> `automations.yaml`/`scripts.yaml` quedaron vacíos. Los entity_id no cambiaron.
+
 ### Sala (LG)
 
 | Script | Qué hace |
