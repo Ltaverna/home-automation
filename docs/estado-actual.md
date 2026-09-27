@@ -41,7 +41,8 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | Bluetooth | adaptador interno R2130 | disponible para BLE futuro |
 | Tailscale (host, no HA) | `tailscale serve` → 8123 | `https://r2130.tail71f19f.ts.net` |
 | FaceEmbed API (`face-embed`, experimental) | contenedor, puerto 8000 | Reconocimiento facial en Hailo-8 (SCRFD + ArcFace, embedding 512-d ~11ms). HailoRT 4.20 dockerizado (no toca el host). DB SQLite en `face-embed/data/`. Scripts en `face-embed/scripts/`. Ver [`referencia-arcface.md`](referencia-arcface.md) |
-| face-recognizer (`face-recognizer`) | contenedor, loop ~4s | Captura `/dev/video0` (Redragon) → face-embed → MQTT. Crea `sensor.ultima_cara` (lucas/desconocido/nadie) por Discovery. Alimenta notif + `input_boolean.lucas_visto_camara` (señal blanda) |
+| face-recognizer (`face-recognizer`) | contenedor, loop ~4s | Captura `/dev/video0` (Redragon) → face-embed → MQTT. Crea `sensor.ultima_cara` (lucas/desconocido/nadie) por Discovery. Alimenta notif + `input_boolean.lucas_visto_camara` (señal blanda). **Pausado por defecto** |
+| healthmon (`healthmon`) | contenedor, loop ~60s | Health-checks HTTP a face-embed/MCP/HA → `binary_sensor.salud_*` por MQTT Discovery. Pinguea healthchecks.io (dead-man switch) si HA OK. Vista "Salud" en el dashboard + automatización `salud_alerta` |
 | MCP Server (`mcp_server`, nativo) | API "assist", endpoint `/mcp_server/sse` | Solo transporte SSE legacy → **incompatible con ChatGPT** (exige streamable HTTP). Sigue activo pero SIN uso; el túnel ya no lo apunta. Sirve por LAN/Tailscale para clientes que toleren SSE |
 | **HA-MCP** (HACS `ha_mcp_tools` 8.5.0) | puerto **9584**, secret_path | El MCP en uso para la nube. Streamable HTTP moderno (protocolo 2025-06-18) + OAuth/DCR → compatible con ChatGPT **y** Claude. Expuesto por el túnel `ha-mcp.neuralcore.dev` → `:9584`. Credencial = **secret_path** aleatorio (modo `webhook_auth: ha_auth` configurado, pero el secret_path da acceso directo). La URL con el secret_path es una credencial → NO va a git (está en la config entry / backup). `llm_api_exposure: both` |
 
@@ -57,6 +58,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 - `input_boolean.modo_simulacion` — "modo vacío" anti-robo. Ambos expuestos a Siri (HomeKit)
 - `sensor.ultima_cara` — último reconocido por la cámara (vía MQTT); atributos `similarity`, `visto`
 - `input_boolean.lucas_visto_camara` — señal blanda: Lucas visto por cámara (no cambia house_mode solo)
+- `binary_sensor.salud_face_embed` / `salud_mcp` / `salud_home_assistant` — salud de servicios (device_class problem; off=ok, on=problema)
 - Scripts nuevos dormitorio: `tv_app_dormitorio` (param `app_id`), `flow_dormitorio`,
   `netflix_dormitorio`, `youtube_dormitorio`; `flow_canal_dormitorio` ahora abre Flow solo.
 - Gotcha operativo: tras un restart de HA, si el Samsung reporta estados raros

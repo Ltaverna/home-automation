@@ -1,23 +1,27 @@
 # Pendientes
 
-> Actualizado: 2026-09-19 (noche). Lo resuelto se mueve al final con fecha.
+> Actualizado: 2026-09-28. Lo resuelto se mueve al final con fecha.
 
 ## Abiertos
 
-- **Reservar IPs en el DHCP del router**: 192.168.1.17 (R2130), 192.168.1.14 (LG),
-  192.168.1.16 (Samsung).
-- ~~Cargar la grilla Flow~~ HECHO 2026-09-28: grilla AMBA completa (~55 canales + alias) en
-  `flow_canal`, validada en vivo en el LG. El `flow_canal_dormitorio` (Samsung) navega a la
-  Guía; el del living no lo necesita.
-- **Activar Quick Start+ en el LG**: hoy al apagarse queda `unavailable` (deep-off). El WoL
-  la enciende igual, pero con Quick Start+ quedaría visible en standby y el estado sería
-  más prolijo.
 - **Test de vida real de llegada/salida**: primera vez que Lucas salga del depto, verificar
   notificación AWAY (~5 min) + apagado de TVs, y HOME al volver. Ajustar geofence si es lento.
 - **Configurar HACS** (está instalado, falta el login con GitHub en Settings → Integrations →
-  Add → HACS). Sirve para updates automáticos de `samsungtv_smart` y futuras integraciones.
+  Add → HACS). Sirve para updates automáticos de `samsungtv_smart`, `ha_mcp_tools` y futuras.
 - **Fase 4**: verificar HailoRT del host == 4.21.0 (lo que exige Frigate 0.16); si no,
   script oficial `user_installation.sh` de Frigate, NO el paquete apt.
+- **healthchecks.io**: crear el check gratuito y pegar la URL en `HEALTHCHECKS_URL` del `.env`
+  de la R2130 (hoy vacío → el watchdog externo no pinguea todavía).
+
+## Refactor de arquitectura (3 sub-proyectos)
+
+- HECHO 2026-09-28: **Observabilidad** — `healthmon` (health-checks → MQTT), `binary_sensor.salud_*`,
+  vista "Salud" en el dashboard, automatización `salud_alerta` (notif al caer/recuperar), y
+  watchdog externo healthchecks.io (falta pegar la URL del check).
+- PENDIENTE: **Parametrización** — mover valores casa-específicos (IPs, MACs, IDs Tizen,
+  secret_path, grilla) a `secrets.yaml`; compose profiles; doc de onboarding de casa nueva.
+- PENDIENTE: **Modularización** — reorganizar la config de HA en packages (tv, house_mode,
+  face, presencia...) para que Fase 2 sume packages en vez de engordar `automations.yaml`.
 
 ## En progreso
 
@@ -76,3 +80,7 @@
   IDs Tizen capturados empíricamente: Flow=`fCCrJTSe28.Flow`, Netflix=`org.tizen.netflix-app`,
   YouTube=`9Ur5IzDKqV.TizenYouTube`.
 - 2026-09-19 · Sony HT-G700: sin red; controlada indirecto por HDMI-CEC a través del Samsung.
+- 2026-09-28 · Reservadas las IPs en el router (`.14` LG, `.16` Samsung, `.17` R2130; MACs verificadas).
+- 2026-09-28 · Quick Start+ activado en el LG: responde en standby, ya no se cae de la red.
+- 2026-09-28 · Grilla Flow AMBA cargada en `flow_canal` (~55 canales + alias), corregida contra
+  la TV real (LN+=15, A24=19; se ajusta sobre la marcha).
