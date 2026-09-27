@@ -370,3 +370,38 @@
             - action: input_boolean.turn_off
               target:
                 entity_id: input_boolean.lucas_visto_camara
+
+- id: salud_alerta
+  alias: "Salud: alerta de servicio"
+  description: "Notifica al iPhone cuando un servicio no-core cae o se recupera (transición)."
+  triggers:
+    - trigger: state
+      entity_id:
+        - binary_sensor.salud_face_embed
+        - binary_sensor.salud_mcp
+      to: "on"
+      id: caido
+    - trigger: state
+      entity_id:
+        - binary_sensor.salud_face_embed
+        - binary_sensor.salud_mcp
+      to: "off"
+      id: recuperado
+  conditions:
+    - condition: template
+      value_template: "{{ trigger.from_state.state not in ['unknown', 'unavailable', 'None'] }}"
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: caido
+          sequence:
+            - action: notify.mobile_app_lucass_iphone
+              data:
+                title: "⚠️ Servicio caído"
+                message: "{{ trigger.to_state.attributes.friendly_name }} no responde."
+      default:
+        - action: notify.mobile_app_lucass_iphone
+          data:
+            title: "✅ Servicio recuperado"
+            message: "{{ trigger.to_state.attributes.friendly_name }} volvió a responder."
