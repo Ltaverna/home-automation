@@ -68,6 +68,7 @@ incluidos en los backups.
 │   ├── packages/             → config por feature (merge automático): tv, house_mode, paseo, seguridad, face, salud
 │   │                           cada archivo agrupa sus automations + scripts + helpers
 │   ├── automations.yaml / scripts.yaml → vacíos ([]/{}); todo migró a packages, se mantiene el !include
+│   │                           (control TV por Siri/HomeKit + MCP; los webhooks de atajos se eliminaron)
 │   ├── scenes.yaml
 │   ├── dashboards/remoto.yaml → dashboard "Control remoto" (d-pad, dígitos, apps, 2 TVs, Salud)
 │   ├── secrets.yaml          → st_bearer, st_url, lg_mac, samsung_mac (NO va a git; ver secrets.yaml.example)
@@ -135,11 +136,11 @@ La R2130 tiene deploy key **read-only**: nunca commitea, solo pullea.
 | Fase | Contenido | Estado |
 |---|---|---|
 | 1 — Base | R2130 + Docker + HA + MQTT + TVs + iPhone + Tailscale + backups | ✅ 2026-09-19 |
-| 1.5 — Extras | house_mode, WoL, apps/canales en ambas TVs (LG local, Samsung vía ST), switches+Siri (HomeKit), remote Centro de Control iOS, dashboard control remoto, webhooks, HACS | ✅ 2026-09-19 |
+| 1.5 — Extras | house_mode, WoL, apps/canales en ambas TVs (LG local, Samsung vía ST), switches+Siri (HomeKit), remote Centro de Control iOS, dashboard control remoto, HACS | ✅ 2026-09-19 |
 | MCP | `ha_mcp_tools` + Cloudflare Tunnel → controlar la casa desde Claude/ChatGPT | ✅ 2026-09-26 |
 | Face rec (PoC) | FaceEmbed en Hailo (SCRFD+ArcFace) → `sensor.ultima_cara` + señal blanda | ✅ 2026-09-27 |
 | Arquitectura | Observabilidad (healthmon) + modularización (packages) + parametrización (secrets/profiles/onboarding) | ✅ 2026-09-28 |
-| Hardening | Backup off-site cifrado (restic→R2) ✅ · webhooks fuera/eliminar ⏳ · observabilidad de nodo ⏳ | 🔶 en curso |
+| Hardening | Backup off-site cifrado (restic→R2) ✅ · webhooks eliminados ✅ · observabilidad de nodo ⏳ | 🔶 en curso |
 | 2 — Presencia | SLZB-06M + Zigbee2MQTT, sensor puerta, mmWave, llegada/salida reales | ⏳ espera compra USA |
 | 3 — Living | Shelly Dimmer (electricista), ESP32 IR → NAD + aire, Modo Cine | ⏳ |
 | 4 — Cámara + AI | HailoRT 4.21 + Frigate + Reolink, person/dog, modo CLEANING, face event-driven | ⏳ |

@@ -8,8 +8,8 @@ Accionable sin la compra USA. Prioridad sugerida:
 1. ~~Backup off-device cifrado~~ **HECHO 2026-09-28**: restic → Cloudflare R2 (`backup-offsite.sh`,
    cron 04:45 root, cifrado/incremental, retención 7d/4w/6m). Restore test OK. `RESTIC_PASSWORD`
    guardada fuera del R2130. Credenciales en `.restic-env` (fuera de git).
-2. **Eliminar los webhooks** (`webhook_flow/netflix/youtube_sala` en `packages/tv.yaml`): sus IDs
-   están en git y son credenciales; ya son redundantes (HomeKit + MCP cubren "abrir apps") → quitar.
+2. ~~Eliminar los webhooks~~ **HECHO 2026-09-28**: quitados de `packages/tv.yaml` (redundantes con
+   HomeKit/MCP) y del entity registry. Sus IDs-credencial ya no están en git ni activos en HA.
 3. **Observabilidad de nodo**: extender `healthmon` / integración System Monitor con CPU, RAM,
    temperatura, uso de NVMe, Hailo. Liviano (NO Prometheus/Grafana). Antes de sumar servicios pesados.
 
