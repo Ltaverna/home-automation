@@ -36,6 +36,19 @@
       `regenerate_secrets` en el options flow si se filtra. Evaluar pasar a OAuth `ha_auth` puro
       más adelante si se quiere login en vez de secreto en URL.
 
+## En progreso
+
+- **Reconocimiento facial (experimental)**:
+  - HECHO 2026-09-27: PoC funcionando. FaceEmbed API de Seeed dockerizada (`face-embed`,
+    HailoRT 4.20 — NO hizo falta el upgrade a 4.21, los .hef cargan con 4.20). Cámara USB
+    Redragon `/dev/video0`. Lucas enrolado (6 tomas, con y sin lentes); reconocimiento ~0.82
+    de similaridad (threshold 0.45). Scripts `face-embed/scripts/{enroll,recognize}.py`.
+  - PENDIENTE: decidir si se integra a HA (ej. reconocer en la entrada → evento MQTT →
+    house_mode / notificación). Requiere pensar dónde/cuándo dispara (no correr inferencia
+    24/7 sin motivo) y la privacidad. Reabre la decisión de la spec (que decía no face rec).
+  - Nota: la cámara USB es de laboratorio; para producción en la entrada iría la cámara PoE
+    de la compra USA (Fase 4) + Frigate para person/dog, y face rec solo en la zona de entrada.
+
 ## Proyectos futuros
 - **Reporte diario** de ocupación/uso (resumen a las 23h). Baja prioridad.
 
