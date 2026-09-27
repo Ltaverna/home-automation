@@ -63,6 +63,21 @@ services:
       - mosquitto
       - face-embed
 
+  # Monitor de salud: health-checks HTTP → MQTT (sensores en HA) + dead-man switch externo.
+  healthmon:
+    build: ./healthmon
+    container_name: healthmon
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - MQTT_HOST=mosquitto
+      - MQTT_USER=${MQTT_USER}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - HEALTHCHECKS_URL=${HEALTHCHECKS_URL}
+      - NODE_IP=192.168.1.17
+    depends_on:
+      - mosquitto
+
   # Túnel dedicado Cloudflare para exponer el endpoint MCP a clientes en la nube.
   # Aislado de los otros túneles de la R2130 (helmet-detection/consorcio/crypto-bot).
   # credentials (cloudflared/ha-mcp.json) fuera de git; config sin secretos.
