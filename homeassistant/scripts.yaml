@@ -33,9 +33,88 @@ flow_canal:
       required: false
       example: "telefe"
   variables:
-    # Grilla Flow (completar con la guía de la TV; claves en minúsculas sin espacios)
+    # Grilla Flow AMBA (guía oficial de Personal Flow). Claves en minúsculas sin espacios;
+    # el lookup normaliza con lower() + replace(' ',''). Incluye alias comunes.
     grilla:
+      # Aire / noticias
+      somosamba: 7
+      metro: 8
+      america: 9
       telefe: 10
+      tvpublica: 11
+      publica: 11
+      eltrece: 12
+      trece: 12
+      elnueve: 13
+      nueve: 13
+      tn: 14
+      a24: 15
+      c5n: 16
+      cronica: 17
+      canal26: 18
+      lanacion: 19
+      lnmas: 19
+      ciudadmagazine: 20
+      nettv: 21
+      cnn: 22
+      cnnenespañol: 22
+      ip: 23
+      bravo: 24
+      kzo: 25
+      # Deportes
+      tycsports: 101
+      tyc: 101
+      espn2: 102
+      espn: 103
+      espn3: 104
+      espn4: 105
+      foxsports: 106
+      foxsports2: 107
+      foxsports3: 108
+      dsports: 109
+      dsports2: 110
+      nbatv: 111
+      espnpremium: 123
+      tntsports: 124
+      # Infantiles
+      disney: 201
+      disneychannel: 201
+      nickelodeon: 202
+      cartoonnetwork: 203
+      discoverykids: 205
+      disneyjr: 207
+      # Cine y series
+      cinemax: 301
+      volver: 303
+      space: 304
+      cinecanal: 305
+      tnt: 306
+      tntseries: 307
+      fx: 308
+      starchannel: 309
+      star: 309
+      sony: 310
+      warner: 311
+      warnerchannel: 311
+      universal: 312
+      axn: 313
+      ae: 315
+      tcm: 318
+      amc: 319
+      golden: 322
+      comedycentral: 326
+      paramount: 327
+      telemundo: 331
+      # Estilo de vida / docs
+      elgourmet: 401
+      foodnetwork: 403
+      tlc: 407
+      natgeo: 450
+      nationalgeographic: 450
+      discovery: 451
+      animalplanet: 452
+      history: 454
+      history2: 458
     canal_num: >-
       {% if canal is defined and canal | string | trim != '' %}
         {{ canal }}
