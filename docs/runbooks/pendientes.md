@@ -5,8 +5,9 @@
 ## Hardening pre-Fase 2 (del roadmap de arquitectura, ver `docs/roadmap-evolucion-arquitectura.md`)
 
 Accionable sin la compra USA. Prioridad sugerida:
-1. **Backup off-device cifrado** (restic → Backblaze B2 / S3 / NAS): el backup actual es local
-   (mismo NVMe) → no protege contra disco muerto/robo. Es el de mayor impacto. **EN CURSO.**
+1. ~~Backup off-device cifrado~~ **HECHO 2026-09-28**: restic → Cloudflare R2 (`backup-offsite.sh`,
+   cron 04:45 root, cifrado/incremental, retención 7d/4w/6m). Restore test OK. `RESTIC_PASSWORD`
+   guardada fuera del R2130. Credenciales en `.restic-env` (fuera de git).
 2. **Eliminar los webhooks** (`webhook_flow/netflix/youtube_sala` en `packages/tv.yaml`): sus IDs
    están en git y son credenciales; ya son redundantes (HomeKit + MCP cubren "abrir apps") → quitar.
 3. **Observabilidad de nodo**: extender `healthmon` / integración System Monitor con CPU, RAM,

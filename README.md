@@ -29,24 +29,34 @@ Spec completa: [`docs/superpowers/specs/2026-09-19-domotica-depto-design.md`](do
         │          (volumen real acá; IR en Fase 3)
         ├── homeassistant (host network, :8123)
         ├── mosquitto (:1883, auth obligatoria)
+        ├── face-embed (:8000, Hailo) · face-recognizer (loop→MQTT, pausado)
+        ├── healthmon (salud→MQTT + dead-man) · cloudflared-mcp (túnel MCP)
         └── [Fase 2+] zigbee2mqtt · frigate+Hailo · esphome · music-assistant
 
   Acceso remoto: Tailscale → https://r2130.tail71f19f.ts.net (tailscale serve → :8123)
-  Apple Home:    HomeKit Bridge (:21063) → Siri nativo para los switches de apps
+  Apple Home:    HomeKit Bridge (:21063) + TV Sala accessory (:21064) → Siri / remote iOS
+  MCP (nube):    ha-mcp.neuralcore.dev (Cloudflare Tunnel → ha_mcp_tools :9584) → Claude/ChatGPT
 ```
 
 ## Servicios (docker-compose.yml)
 
-| Servicio | Rol | Notas |
+Perfiles Docker (`COMPOSE_PROFILES` en `.env`): **base** siempre; `face` y `obs` opcionales.
+
+| Servicio | Profile | Rol |
 |---|---|---|
-| `homeassistant` | Cerebro: automatizaciones, house modes, integraciones | host network, caps BT (NET_ADMIN/NET_RAW), dbus |
-| `mosquitto` | Broker MQTT | anónimo rechazado; passwd fuera de git |
+| `homeassistant` | base | Cerebro: automatizaciones, house modes, integraciones (host network, caps BT, dbus) |
+| `mosquitto` | base | Broker MQTT (anónimo rechazado; passwd fuera de git) |
+| `cloudflared-mcp` | base | Túnel Cloudflare dedicado → endpoint MCP (`ha_mcp_tools`) para Claude/ChatGPT |
+| `face-embed` | face | Reconocimiento facial en Hailo-8 (SCRFD+ArcFace, API :8000) — HailoRT 4.20 |
+| `face-recognizer` | face | Loop cámara→face-embed→MQTT (`sensor.ultima_cara`). **Pausado por defecto** |
+| `healthmon` | obs | Health-checks HTTP→MQTT (`binary_sensor.salud_*`) + dead-man switch externo |
 
-Dentro de HA además: **HACS** (instalado, pendiente de configurar) y la integración custom
-**`samsungtv_smart`** (ollo69, para la TV del dormitorio) en `custom_components/` (fuera de git).
+Dentro de HA además: **HACS** (instalado, pendiente de configurar) y las integraciones custom
+**`samsungtv_smart`** (ollo69) y **`ha_mcp_tools`** (MCP server) en `custom_components/` (fuera de git).
 
-Los secretos viven en `.env`, `mosquitto/config/passwd` y `homeassistant/secrets.yaml`
-(token SmartThings) — todos fuera de git, incluidos en el backup nocturno.
+Los secretos viven en `.env`, `mosquitto/config/passwd`, `homeassistant/secrets.yaml`
+(`st_bearer`/`st_url`/`lg_mac`/`samsung_mac`) y `.restic-env` (credenciales R2) — todos fuera de git,
+incluidos en los backups.
 
 ## Estructura del repo
 
@@ -64,12 +74,17 @@ Los secretos viven en `.env`, `mosquitto/config/passwd` y `homeassistant/secrets
 │   └── custom_components/    → HACS + samsungtv_smart + ha_mcp_tools (NO va a git; en backup)
 ├── healthmon/ face-embed/ face-recognizer/ cloudflared/  → contenedores propios (Dockerfile)
 ├── mosquitto/config/mosquitto.conf
-├── scripts/backup.sh         → cron 04:30 en la R2130 → /opt/backups (retiene 14)
+├── .restic-env(.example)     → credenciales R2 para el backup off-site (real fuera de git)
+├── scripts/
+│   ├── backup.sh             → cron 04:30 → /opt/backups (tar local, 14 días)
+│   └── backup-offsite.sh     → cron 04:45 → Cloudflare R2 (restic cifrado, 7d/4w/6m)
 └── docs/
     ├── estado-actual.md      → INVENTARIO VIVO: qué hay hoy y cómo se usa
+    ├── roadmap-evolucion-arquitectura.md → norte del proyecto (semantic home / edge AI)
     ├── runbooks/
-    │   ├── instalacion-r2130.md  → accesos, recovery desde cero, gotchas
-    │   └── pendientes.md         → decisiones tomadas y deuda pendiente
+    │   ├── instalacion-r2130.md      → accesos, recovery (local + R2), gotchas
+    │   ├── onboarding-casa-nueva.md  → instalar en otra casa (segunda instancia)
+    │   └── pendientes.md             → decisiones, deuda, hardening
     └── superpowers/
         ├── specs/            → diseño aprobado (spec)
         └── plans/            → planes de implementación por fase
@@ -113,6 +128,7 @@ La R2130 tiene deploy key **read-only**: nunca commitea, solo pullea.
 4. **Entidades fantasma del LG**: si la integración webostv se re-parea, HA puede resucitar entidades viejas con sufijo `_2`. Limpiar por WebSocket API (`config/entity_registry/remove` + `update`), no editando `.storage` a mano.
 5. **samsungtv_smart tras un restart de HA** puede quedar con la conexión ws a medias (estado `off`/app `None` con la TV prendida, comandos que no llegan): recargar la config entry (Settings → Integrations → TV Dormitorio → Reload, o por API).
 6. **El volumen del LG en HA no mueve el audio del living** — la salida óptica es de nivel fijo; el volumen real lo tiene el NAD (IR en Fase 3).
+7. **El backup off-site corre como root** — `.storage`/`passwd` son de root; el cron es de root. Si se corre a mano, `sudo`. La `RESTIC_PASSWORD` vive fuera del R2130: sin ella el backup es irrecuperable.
 
 ## Roadmap
 
@@ -120,9 +136,14 @@ La R2130 tiene deploy key **read-only**: nunca commitea, solo pullea.
 |---|---|---|
 | 1 — Base | R2130 + Docker + HA + MQTT + TVs + iPhone + Tailscale + backups | ✅ 2026-09-19 |
 | 1.5 — Extras | house_mode, WoL, apps/canales en ambas TVs (LG local, Samsung vía ST), switches+Siri (HomeKit), remote Centro de Control iOS, dashboard control remoto, webhooks, HACS | ✅ 2026-09-19 |
+| MCP | `ha_mcp_tools` + Cloudflare Tunnel → controlar la casa desde Claude/ChatGPT | ✅ 2026-09-26 |
+| Face rec (PoC) | FaceEmbed en Hailo (SCRFD+ArcFace) → `sensor.ultima_cara` + señal blanda | ✅ 2026-09-27 |
+| Arquitectura | Observabilidad (healthmon) + modularización (packages) + parametrización (secrets/profiles/onboarding) | ✅ 2026-09-28 |
+| Hardening | Backup off-site cifrado (restic→R2) ✅ · webhooks fuera/eliminar ⏳ · observabilidad de nodo ⏳ | 🔶 en curso |
 | 2 — Presencia | SLZB-06M + Zigbee2MQTT, sensor puerta, mmWave, llegada/salida reales | ⏳ espera compra USA |
 | 3 — Living | Shelly Dimmer (electricista), ESP32 IR → NAD + aire, Modo Cine | ⏳ |
-| 4 — Cámara + AI | HailoRT 4.21 + Frigate + Reolink, person/dog, modo CLEANING | ⏳ |
+| 4 — Cámara + AI | HailoRT 4.21 + Frigate + Reolink, person/dog, modo CLEANING, face event-driven | ⏳ |
 | 5 — Voz + audio | Voice PE, Music Assistant → USB-S/PDIF → NAD | ⏳ |
 
 BOM de compra USA (verificado sept-2026, ~USD 505-545): ver la spec, sección BOM.
+Norte del proyecto (semantic home / vision fusion / MCP de dominio): ver `docs/roadmap-evolucion-arquitectura.md`.

@@ -130,6 +130,9 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 - `homeassistant/secrets.yaml` (fuera de git): `st_bearer`, `st_url`, `lg_mac`, `samsung_mac`.
   Plantilla versionada en `secrets.yaml.example`. Los packages los usan con `!secret`.
 - `COMPOSE_PROFILES` en `.env` (casa principal: `face,obs`) — define qué servicios levantan.
+- Backups (dos capas): (1) local 04:30 → `/opt/backups` (tar, 14 días); (2) off-site 04:45 →
+  Cloudflare R2 con restic (cifrado, incremental, 7d/4w/6m). Credenciales en `.restic-env` (600,
+  fuera de git). Restore verificado. La `RESTIC_PASSWORD` está fuera del R2130 (imprescindible).
 
 ## Pendientes
 

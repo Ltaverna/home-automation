@@ -32,9 +32,21 @@
     TV, samsungtv_smart con token ST, HomeKit re-pairing en app Casa) y regenerar tokens de
     API (el del mini-PC vive en `~/.ha_token`).
 
-## Backups
-- Nocturno 04:30 (cron de root) → /opt/backups/home-automation/ (14 días de retención).
-- Las configs también están en git; .env / homeassistant/.storage / mosquitto passwd SOLO en el backup.
+## Backups (dos capas)
+- **Local** 04:30 (cron root) → /opt/backups/home-automation/ (tar, 14 días). Protege errores operativos.
+- **Off-site cifrado** 04:45 (cron root) → Cloudflare R2 con restic (`scripts/backup-offsite.sh`).
+  Incremental, cifrado, retención 7d/4w/6m. Credenciales en `/opt/home-automation/.restic-env`
+  (600, fuera de git; plantilla en `.restic-env.example`). Corre como **root** (necesita leer
+  `.storage`/`passwd`). Dead-man opcional vía `BACKUP_HC_URL`.
+- Las configs también están en git; `.env` / `.storage` / `secrets.yaml` / `passwd` / DB de caras
+  SOLO en los backups.
+
+### Restaurar desde R2 (disaster recovery)
+1. Instalar restic; crear `.restic-env` desde `.restic-env.example` con las credenciales R2 y la
+   `RESTIC_PASSWORD` (guardada fuera del R2130 — **sin ella el backup es irrecuperable**).
+2. `sudo bash -c 'set -a; source /opt/home-automation/.restic-env; set +a; restic snapshots'` → elegir snapshot.
+3. `restic restore <id> --target /tmp/r` y mover a `/opt/home-automation`, o `--target /` con cuidado.
+4. `docker compose up -d`.
 
 ## Acceso remoto (Tailscale)
 - R2130 en tailnet: `100.105.233.7` / `https://r2130.tail71f19f.ts.net` (proxy `tailscale serve` → 8123).
