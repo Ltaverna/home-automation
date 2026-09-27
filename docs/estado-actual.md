@@ -40,7 +40,8 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | HACS | instalado, **sin configurar** | login GitHub pendiente; gestiona `samsungtv_smart` |
 | Bluetooth | adaptador interno R2130 | disponible para BLE futuro |
 | Tailscale (host, no HA) | `tailscale serve` → 8123 | `https://r2130.tail71f19f.ts.net` |
-| FaceEmbed API (`face-embed`, experimental) | contenedor, puerto 8000 | Reconocimiento facial en Hailo-8 (SCRFD + ArcFace, embedding 512-d ~11ms). HailoRT 4.20 dockerizado (no toca el host). Cámara USB Redragon `/dev/video0`. DB SQLite en `face-embed/data/`. Scripts en `face-embed/scripts/`. NO integrado a HA todavía |
+| FaceEmbed API (`face-embed`, experimental) | contenedor, puerto 8000 | Reconocimiento facial en Hailo-8 (SCRFD + ArcFace, embedding 512-d ~11ms). HailoRT 4.20 dockerizado (no toca el host). DB SQLite en `face-embed/data/`. Scripts en `face-embed/scripts/`. Ver [`referencia-arcface.md`](referencia-arcface.md) |
+| face-recognizer (`face-recognizer`) | contenedor, loop ~4s | Captura `/dev/video0` (Redragon) → face-embed → MQTT. Crea `sensor.ultima_cara` (lucas/desconocido/nadie) por Discovery. Alimenta notif + `input_boolean.lucas_visto_camara` (señal blanda) |
 | MCP Server (`mcp_server`, nativo) | API "assist", endpoint `/mcp_server/sse` | Solo transporte SSE legacy → **incompatible con ChatGPT** (exige streamable HTTP). Sigue activo pero SIN uso; el túnel ya no lo apunta. Sirve por LAN/Tailscale para clientes que toleren SSE |
 | **HA-MCP** (HACS `ha_mcp_tools` 8.5.0) | puerto **9584**, secret_path | El MCP en uso para la nube. Streamable HTTP moderno (protocolo 2025-06-18) + OAuth/DCR → compatible con ChatGPT **y** Claude. Expuesto por el túnel `ha-mcp.neuralcore.dev` → `:9584`. Credencial = **secret_path** aleatorio (modo `webhook_auth: ha_auth` configurado, pero el secret_path da acceso directo). La URL con el secret_path es una credencial → NO va a git (está en la config entry / backup). `llm_api_exposure: both` |
 
@@ -54,6 +55,8 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
   para el Samsung (lanzan vía SmartThings). Los 6 expuestos a Siri por HomeKit Bridge.
 - `input_boolean.modo_paseo` — paseo del perro; suspende AWAY 30 min (timer `timer.paseo`)
 - `input_boolean.modo_simulacion` — "modo vacío" anti-robo. Ambos expuestos a Siri (HomeKit)
+- `sensor.ultima_cara` — último reconocido por la cámara (vía MQTT); atributos `similarity`, `visto`
+- `input_boolean.lucas_visto_camara` — señal blanda: Lucas visto por cámara (no cambia house_mode solo)
 - Scripts nuevos dormitorio: `tv_app_dormitorio` (param `app_id`), `flow_dormitorio`,
   `netflix_dormitorio`, `youtube_dormitorio`; `flow_canal_dormitorio` ahora abre Flow solo.
 - Gotcha operativo: tras un restart de HA, si el Samsung reporta estados raros
@@ -99,6 +102,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | `modo_paseo_inicio` / `modo_paseo_fin` | Paseo del perro: apaga TVs + timer 30 min; suspende AWAY; se cierra por timer o al volver a home |
 | `aviso_tv_prendida_sin_nadie` / `aviso_tv_accion_apagar` | Estando AWAY con TV encendida 2 min → notif accionable (long-press muestra "Apagar"); `not modo_simulacion` |
 | `simulacion_toggle_tv_living` / `simulacion_apagar_a_las_23_30` | Modo simulación + AWAY, 19-23:30: togglea el LG al azar (50% cada 30 min); apaga a las 23:30 |
+| `face_reconocido` / `face_lucas_presencia` | Notif al reconocer (o cara desconocida); prende/apaga `lucas_visto_camara` (señal blanda) |
 
 ## Control desde el iPhone
 
