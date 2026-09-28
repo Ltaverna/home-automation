@@ -2,7 +2,7 @@ name: home-automation
 
 services:
   mosquitto:
-    image: eclipse-mosquitto:2
+    image: eclipse-mosquitto:2.1.2
     container_name: mosquitto
     restart: unless-stopped
     ports:
@@ -15,7 +15,7 @@ services:
       - TZ=${TZ}
 
   homeassistant:
-    image: ghcr.io/home-assistant/home-assistant:stable
+    image: ghcr.io/home-assistant/home-assistant:2026.9.3
     container_name: homeassistant
     restart: unless-stopped
     network_mode: host
@@ -85,7 +85,7 @@ services:
   # Aislado de los otros túneles de la R2130 (helmet-detection/consorcio/crypto-bot).
   # credentials (cloudflared/ha-mcp.json) fuera de git; config sin secretos.
   cloudflared-mcp:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:2026.9.3
     container_name: cloudflared-mcp
     restart: unless-stopped
     network_mode: host
