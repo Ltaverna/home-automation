@@ -46,7 +46,10 @@
    `RESTIC_PASSWORD` (guardada fuera del R2130 — **sin ella el backup es irrecuperable**).
 2. `sudo bash -c 'set -a; source /opt/home-automation/.restic-env; set +a; restic snapshots'` → elegir snapshot.
 3. `restic restore <id> --target /tmp/r` y mover a `/opt/home-automation`, o `--target /` con cuidado.
-4. `docker compose up -d`.
+4. **DB de HA:** el backup guarda `homeassistant/home-assistant_v2.db.bak` (snapshot consistente, no
+   la `.db` viva). Renombrarlo antes de arrancar: `mv homeassistant/home-assistant_v2.db.bak
+   homeassistant/home-assistant_v2.db`. (Si no existe el `.bak`, el backup se hizo sin sqlite3 y trae la `.db`.)
+5. `docker compose up -d`.
 
 ## Acceso remoto (Tailscale)
 - R2130 en tailnet: `100.105.233.7` / `https://r2130.tail71f19f.ts.net` (proxy `tailscale serve` → 8123).

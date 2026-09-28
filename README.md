@@ -29,7 +29,7 @@ Spec completa: [`docs/superpowers/specs/2026-09-19-domotica-depto-design.md`](do
         │          (volumen real acá; IR en Fase 3)
         ├── homeassistant (host network, :8123)
         ├── mosquitto (:1883, auth obligatoria)
-        ├── face-embed (:8000, Hailo) · face-recognizer (loop→MQTT, pausado)
+        ├── face-embed (:8000, Hailo) · face-recognizer (loop→MQTT, profile experimental)
         ├── healthmon (salud→MQTT + dead-man) · cloudflared-mcp (túnel MCP)
         └── [Fase 2+] zigbee2mqtt · frigate+Hailo · esphome · music-assistant
 
@@ -40,7 +40,7 @@ Spec completa: [`docs/superpowers/specs/2026-09-19-domotica-depto-design.md`](do
 
 ## Servicios (docker-compose.yml)
 
-Perfiles Docker (`COMPOSE_PROFILES` en `.env`): **base** siempre; `face` y `obs` opcionales.
+Perfiles Docker (`COMPOSE_PROFILES` en `.env`): **base** siempre; `face`, `obs` y `experimental` opcionales.
 
 | Servicio | Profile | Rol |
 |---|---|---|
@@ -48,8 +48,8 @@ Perfiles Docker (`COMPOSE_PROFILES` en `.env`): **base** siempre; `face` y `obs`
 | `mosquitto` | base | Broker MQTT (anónimo rechazado; passwd fuera de git) |
 | `cloudflared-mcp` | base | Túnel Cloudflare dedicado → endpoint MCP (`ha_mcp_tools`) para Claude/ChatGPT |
 | `face-embed` | face | Reconocimiento facial en Hailo-8 (SCRFD+ArcFace, API :8000) — HailoRT 4.20 |
-| `face-recognizer` | face | Loop cámara→face-embed→MQTT (`sensor.ultima_cara`). **Pausado por defecto** |
-| `healthmon` | obs | Health-checks HTTP→MQTT (`binary_sensor.salud_*`) + dead-man switch externo |
+| `face-recognizer` | **experimental** | Loop cámara→face-embed→MQTT (`sensor.ultima_cara`). Profile aparte → **no arranca en la casa principal** |
+| `healthmon` | obs | Health-checks HTTP→MQTT (`binary_sensor.salud_*`; chequeo MCP distingue 5xx de 404) + dead-man switch |
 
 Dentro de HA además: **HACS** (instalado, pendiente de configurar) y las integraciones custom
 **`samsungtv_smart`** (ollo69) y **`ha_mcp_tools`** (MCP server) en `custom_components/` (fuera de git).
@@ -76,16 +76,21 @@ incluidos en los backups.
 ├── healthmon/ face-embed/ face-recognizer/ cloudflared/  → contenedores propios (Dockerfile)
 ├── mosquitto/config/mosquitto.conf
 ├── .restic-env(.example)     → credenciales R2 para el backup off-site (real fuera de git)
+├── .github/workflows/ci.yml  → CI: yamllint + docker compose config + gitleaks
 ├── scripts/
-│   ├── backup.sh             → cron 04:30 → /opt/backups (tar local, 14 días)
+│   ├── backup.sh             → cron 04:30 → /opt/backups (tar local, 14 días; DB consistente sqlite3)
 │   ├── backup-offsite.sh     → cron 04:45 → Cloudflare R2 (restic cifrado, 7d/4w/6m)
-│   └── node-metrics.sh       → cron root 1 min → métricas del host (CPU/RAM/temp/NVMe/SMART) a MQTT
+│   ├── restic-check.sh       → cron semanal → integridad del repo restic
+│   └── node-metrics.sh       → cron root 1 min → métricas del host (CPU/RAM/temp/NVMe/SMART/backup) a MQTT
 └── docs/
     ├── estado-actual.md      → INVENTARIO VIVO: qué hay hoy y cómo se usa
     ├── roadmap-evolucion-arquitectura.md → norte del proyecto (semantic home / edge AI)
+    ├── development-handoff-sprint-a-f.md → handoff de ChatGPT (Sprints A-F)
     ├── runbooks/
     │   ├── instalacion-r2130.md      → accesos, recovery (local + R2), gotchas
     │   ├── onboarding-casa-nueva.md  → instalar en otra casa (segunda instancia)
+    │   ├── upgrades.md               → pin de imágenes Docker + proceso de upgrade/rollback
+    │   ├── mcp-security.md           → capas de auth del MCP + MCP Server Portal (Cloudflare Access)
     │   └── pendientes.md             → decisiones, deuda, hardening
     └── superpowers/
         ├── specs/            → diseño aprobado (spec)
@@ -113,8 +118,9 @@ ssh r2130 'docker restart homeassistant'
 ```
 
 **Perfiles de servicios:** `COMPOSE_PROFILES` en `.env` decide qué levanta cada casa
-(`face` = face-embed + face-recognizer, requieren Hailo/cámara · `obs` = healthmon). La base
-(mosquitto, homeassistant, cloudflared-mcp) siempre. Casa principal: `face,obs`.
+(`face` = face-embed API · `experimental` = face-recognizer/loop de cámara · `obs` = healthmon +
+métricas de nodo). La base (mosquitto, homeassistant, cloudflared-mcp) siempre. Casa principal:
+`face,obs` (sin `experimental` → sin captura de cámara).
 
 **Instalar en otra casa:** ver [`docs/runbooks/onboarding-casa-nueva.md`](docs/runbooks/onboarding-casa-nueva.md).
 El repo aporta la lógica (packages, scripts, compose); cada casa su contexto (`.env`, `secrets.yaml`,
@@ -142,6 +148,7 @@ La R2130 tiene deploy key **read-only**: nunca commitea, solo pullea.
 | Face rec (PoC) | FaceEmbed en Hailo (SCRFD+ArcFace) → `sensor.ultima_cara` + señal blanda | ✅ 2026-09-27 |
 | Arquitectura | Observabilidad (healthmon) + modularización (packages) + parametrización (secrets/profiles/onboarding) | ✅ 2026-09-28 |
 | Hardening | Backup off-site cifrado (restic→R2) ✅ · webhooks eliminados ✅ · observabilidad de nodo ✅ | ✅ 2026-09-28 |
+| Sprint A | Fix healthmon MCP · external_url · pin Docker · split face-loop · backups (check/consistencia/edad) · CI · MCP hardening | ✅ 2026-09-28 (MCP Portal Access: pendiente dashboard) |
 | 2 — Presencia | SLZB-06M + Zigbee2MQTT, sensor puerta, mmWave, llegada/salida reales | ⏳ espera compra USA |
 | 3 — Living | Shelly Dimmer (electricista), ESP32 IR → NAD + aire, Modo Cine | ⏳ |
 | 4 — Cámara + AI | HailoRT 4.21 + Frigate + Reolink, person/dog, modo CLEANING, face event-driven | ⏳ |

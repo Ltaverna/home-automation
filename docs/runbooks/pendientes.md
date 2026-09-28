@@ -20,6 +20,24 @@ Accionable sin la compra USA. Prioridad sugerida:
 El resto del roadmap (Vision Fusion, Frigate person/dog, pose, dog classifier, CLIP, estado
 semántico + MCP de dominio) es el norte, pero depende de la compra USA (sensores/cámara).
 
+## Sprint A — Hardening del handoff de ChatGPT (`docs/development-handoff-sprint-a-f.md`)
+
+**HECHO 2026-09-28** (spec/plan en `docs/superpowers/{specs,plans}/2026-09-28-hardening-sprint-a*`):
+1. ~~Fix healthmon MCP~~ — `check_mcp` distingue 5xx/timeout (down) de transporte vivo (404 = up).
+2. ~~external_url~~ — apuntaba al túnel MCP; ahora `https://r2130.tail71f19f.ts.net` (Tailscale).
+3. ~~Pin imágenes Docker~~ — HA `2026.9.3`, cloudflared `2026.9.3`, mosquitto por digest. Runbook `upgrades.md`.
+4. ~~Split face-api/face-loop~~ — `face-recognizer` a profile `experimental` (no arranca en la casa principal).
+5. ~~Backups~~ — DB consistente (`sqlite3 .backup`), `restic check` semanal, `sensor.node_last_backup_age` + alerta >36h.
+6. ~~CI mínimo~~ — GitHub Actions: yamllint + `docker compose config` + gitleaks (run verde).
+7. **MCP hardening** — local HECHO (deny floor verificado, exposición documentada, runbook `mcp-security.md`).
+   **PENDIENTE (acción usuario):** el MCP Server Portal de Cloudflare. Decisión: se hace por **dashboard**
+   (Zero Trust → Access controls → MCP Portals; pasos en `mcp-security.md`) porque la API (beta) requiere
+   un permiso **AI Controls** en el token (hoy da 403) y su schema no está documentado. Es **aditivo**
+   (subdominio nuevo, OAuth); el endpoint actual con secret_path no se toca. Tras crearlo, cambiar la URL
+   de los connectors ChatGPT/Claude a `https://<sub>.neuralcore.dev/mcp` y testear.
+
+Fase 2 (presencia física: Zigbee/mmWave/door) es el próximo norte, espera compra USA.
+
 ## Abiertos
 
 - **Test de vida real de llegada/salida**: primera vez que Lucas salga del depto, verificar

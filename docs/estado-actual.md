@@ -41,10 +41,10 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | Bluetooth | adaptador interno R2130 | disponible para BLE futuro |
 | Tailscale (host, no HA) | `tailscale serve` → 8123 | `https://r2130.tail71f19f.ts.net` |
 | FaceEmbed API (`face-embed`, experimental) | contenedor, puerto 8000 | Reconocimiento facial en Hailo-8 (SCRFD + ArcFace, embedding 512-d ~11ms). HailoRT 4.20 dockerizado (no toca el host). DB SQLite en `face-embed/data/`. Scripts en `face-embed/scripts/`. Ver [`referencia-arcface.md`](referencia-arcface.md) |
-| face-recognizer (`face-recognizer`) | contenedor, loop ~4s | Captura `/dev/video0` (Redragon) → face-embed → MQTT. Crea `sensor.ultima_cara` (lucas/desconocido/nadie) por Discovery. Alimenta notif + `input_boolean.lucas_visto_camara` (señal blanda). **Pausado por defecto** |
-| healthmon (`healthmon`) | contenedor, loop ~60s | Health-checks HTTP a face-embed/MCP/HA → `binary_sensor.salud_*` por MQTT Discovery. Pinguea healthchecks.io (dead-man switch) si HA OK. Vista "Salud" en el dashboard + automatización `salud_alerta` |
+| face-recognizer (`face-recognizer`) | contenedor, profile **`experimental`** | Captura `/dev/video0` (Redragon) → face-embed → MQTT. Crea `sensor.ultima_cara` por Discovery. **NO arranca en la casa principal** (profile `experimental`, no `face`): un `docker compose up -d` normal no toca la cámara. Levantarlo solo bajo demanda con `COMPOSE_PROFILES=...,experimental` |
+| healthmon (`healthmon`) | contenedor, loop ~60s | Health-checks HTTP a face-embed/MCP/HA → `binary_sensor.salud_*` por MQTT Discovery. El chequeo del MCP distingue transporte vivo (404 = up) de error de servidor (5xx/timeout = down), no reporta "ok" ciego. Pinguea healthchecks.io (dead-man) si HA OK. Vista "Salud" + automatización `salud_alerta` |
 | MCP Server (`mcp_server`, nativo) | API "assist", endpoint `/mcp_server/sse` | Solo transporte SSE legacy → **incompatible con ChatGPT** (exige streamable HTTP). Sigue activo pero SIN uso; el túnel ya no lo apunta. Sirve por LAN/Tailscale para clientes que toleren SSE |
-| **HA-MCP** (HACS `ha_mcp_tools` 8.5.0) | puerto **9584**, secret_path | El MCP en uso para la nube. Streamable HTTP moderno (protocolo 2025-06-18) + OAuth/DCR → compatible con ChatGPT **y** Claude. Expuesto por el túnel `ha-mcp.neuralcore.dev` → `:9584`. Credencial = **secret_path** aleatorio (modo `webhook_auth: ha_auth` configurado, pero el secret_path da acceso directo). La URL con el secret_path es una credencial → NO va a git (está en la config entry / backup). `llm_api_exposure: both` |
+| **HA-MCP** (HACS `ha_mcp_tools` 8.5.0) | puerto **9584**, secret_path | El MCP en uso para la nube. Streamable HTTP moderno + OAuth/DCR → compatible con ChatGPT **y** Claude. Túnel `ha-mcp.neuralcore.dev` → `:9584`. Credencial = **secret_path** aleatorio. Deny floor no-anulable sobre `.storage`/`secrets.yaml`. Endurecimiento y plan de MCP Server Portal (Cloudflare Access, OAuth) en [`runbooks/mcp-security.md`](runbooks/mcp-security.md). `llm_api_exposure: both` |
 
 ## Entidades y helpers clave
 
@@ -59,7 +59,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 - `sensor.ultima_cara` — último reconocido por la cámara (vía MQTT); atributos `similarity`, `visto`
 - `input_boolean.lucas_visto_camara` — señal blanda: Lucas visto por cámara (no cambia house_mode solo)
 - `binary_sensor.salud_face_embed` / `salud_mcp` / `salud_home_assistant` — salud de servicios (device_class problem; off=ok, on=problema)
-- `sensor.node_cpu` / `node_ram` / `node_temp_cpu` / `node_temp_nvme` / `node_disk` + `binary_sensor.node_nvme_smart` — métricas del host R2130 (device "Nodo R2130"), publicadas cada ~1 min por `scripts/node-metrics.sh` (cron root). La temp del Hailo-8 no se expone (no hay hwmon/hailortcli on-demand); se muestra la del NVMe
+- `sensor.node_cpu` / `node_ram` / `node_temp_cpu` / `node_temp_nvme` / `node_disk` / `node_last_backup_age` + `binary_sensor.node_nvme_smart` — métricas del host R2130 (device "Nodo R2130"), publicadas cada ~1 min por `scripts/node-metrics.sh` (cron root). La temp del Hailo-8 no se expone (no hay hwmon/hailortcli on-demand); se muestra la del NVMe. `node_last_backup_age` = horas desde el último backup off-site (lee el marker `.last-backup-offsite`). **Gotcha:** esta versión de HA ignora el `object_id` en MQTT Discovery, así que los sensores nacen como `sensor.nodo_r2130_nodo_*` y se renombran a mano por WebSocket a `sensor.node_*` (en una casa nueva, repetir el rename)
 - Scripts nuevos dormitorio: `tv_app_dormitorio` (param `app_id`), `flow_dormitorio`,
   `netflix_dormitorio`, `youtube_dormitorio`; `flow_canal_dormitorio` ahora abre Flow solo.
 - Gotcha operativo: tras un restart de HA, si el Samsung reporta estados raros
@@ -99,7 +99,10 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 
 | Script | Qué hace |
 |---|---|
-| `scripts/node-metrics.sh` | Cron root cada 1 min → `/var/log/node-metrics.log`. Publica métricas del host (CPU, RAM, temp CPU, temp NVMe, disco `/`, SMART NVMe) a MQTT Discovery (device "Nodo R2130"). PATH explícito porque `smartctl` vive en `/usr/sbin` (fuera del PATH de cron). Métricas del host (no de un contenedor sin privilegios), coherente con `healthmon` |
+| `scripts/node-metrics.sh` | Cron root cada 1 min → `/var/log/node-metrics.log`. Publica métricas del host (CPU, RAM, temp CPU, temp NVMe, disco `/`, SMART NVMe, antigüedad del backup) a MQTT Discovery (device "Nodo R2130"). PATH explícito porque `smartctl` vive en `/usr/sbin` (fuera del PATH de cron). Coherente con `healthmon` |
+| `scripts/backup.sh` | Cron root 04:30 → `/opt/backups` (tar, 14 días). La DB de HA se copia con `sqlite3 .backup` (snapshot consistente que integra el WAL) a `home-assistant_v2.db.bak`; se respalda ESA copia, no la `.db` viva. El `.bak` persiste y lo reusa el backup off-site |
+| `scripts/backup-offsite.sh` | Cron root 04:45 → Cloudflare R2 (restic cifrado, 7d/4w/6m). Excluye la `.db` viva (usa el `.bak` consistente). Escribe el marker `.last-backup-offsite`. Dead-man a healthchecks.io |
+| `scripts/restic-check.sh` | Cron root **semanal** (domingos 05:15) → `/var/log/restic-check.log`. `restic check --read-data-subset=5%` (integridad del repo R2). NO corre en cada backup |
 
 ## Automatizaciones
 
@@ -116,7 +119,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | `simulacion_toggle_tv_living` / `simulacion_apagar_a_las_23_30` | Modo simulación + AWAY, 19-23:30: togglea el LG al azar (50% cada 30 min); apaga a las 23:30 |
 | `face_reconocido` / `face_lucas_presencia` | Notif al reconocer (o cara desconocida); prende/apaga `lucas_visto_camara` (señal blanda) |
 | `salud_alerta` | Notif al iPhone cuando un servicio no-core cae/recupera (transición) |
-| `nodo_alerta` | Notif accionable de salud del host: disco `/` > 85% (5 min), temp CPU > 80 °C (2 min) o SMART del NVMe en falla |
+| `nodo_alerta` | Notif accionable de salud del host: disco `/` > 85% (5 min), temp CPU > 80 °C (2 min), SMART del NVMe en falla, o backup off-site > 36 h |
 
 ## Control desde el iPhone
 
@@ -139,9 +142,12 @@ IDs eran credenciales en git. El control por voz/remoto ya está cubierto por Si
 - `homeassistant/secrets.yaml` (fuera de git): `st_bearer`, `st_url`, `lg_mac`, `samsung_mac`.
   Plantilla versionada en `secrets.yaml.example`. Los packages los usan con `!secret`.
 - `COMPOSE_PROFILES` en `.env` (casa principal: `face,obs`) — define qué servicios levantan.
-- Backups (dos capas): (1) local 04:30 → `/opt/backups` (tar, 14 días); (2) off-site 04:45 →
-  Cloudflare R2 con restic (cifrado, incremental, 7d/4w/6m). Credenciales en `.restic-env` (600,
-  fuera de git). Restore verificado. La `RESTIC_PASSWORD` está fuera del R2130 (imprescindible).
+- Backups (dos capas + verificación): (1) local 04:30 → `/opt/backups` (tar, 14 días); (2) off-site
+  04:45 → Cloudflare R2 con restic (cifrado, incremental, 7d/4w/6m); (3) `restic check` semanal.
+  La DB de HA se respalda como snapshot consistente (`sqlite3 .backup` → `.db.bak`). **Al restaurar,
+  renombrar `home-assistant_v2.db.bak` → `home-assistant_v2.db`.** Antigüedad monitoreada
+  (`sensor.node_last_backup_age`, alerta > 36 h). Credenciales en `.restic-env` (600, fuera de git).
+  La `RESTIC_PASSWORD` está fuera del R2130 (imprescindible).
 
 ## Pendientes
 
