@@ -18,18 +18,23 @@ if ! restic snapshots >/dev/null 2>&1; then
   restic init
 fi
 
-# Backup incremental cifrado.
+# Backup incremental cifrado. Se excluye la .db viva: backup.sh (04:45 antes) deja
+# home-assistant_v2.db.bak, un snapshot consistente de SQLite que sí se respalda.
 restic backup "$SRC" \
   --tag r2130 \
   --exclude "$SRC/frigate/media" \
   --exclude "**/__pycache__" \
   --exclude "*.log" \
   --exclude "*.log.*" \
+  --exclude "$SRC/homeassistant/home-assistant_v2.db" \
   --exclude "$SRC/homeassistant/home-assistant_v2.db-wal" \
   --exclude "$SRC/homeassistant/home-assistant_v2.db-shm"
 
 # Retención.
 restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune
+
+# Marker local para el sensor de antigüedad (evita consultar R2 en cada tick de metrics).
+date -Is > /opt/home-automation/.last-backup-offsite
 
 # Dead-man switch: solo si todo lo anterior salió OK (set -e aborta antes si falla).
 if [ -n "${BACKUP_HC_URL:-}" ]; then

@@ -36,6 +36,7 @@ discovery temp_cpu "Nodo Temp CPU" temperature "°C"
 discovery temp_nvme "Nodo Temp NVMe" temperature "°C"
 discovery disk "Nodo Disco NVMe" "" "%"
 discovery nvme_smart "Nodo SMART NVMe" problem "" binary_sensor
+discovery last_backup_age "Nodo Antigüedad Backup" duration "h"
 
 # --- CPU % (delta de /proc/stat en 1s) ---
 read_cpu() { awk '/^cpu /{t=$2+$3+$4+$5+$6+$7+$8; i=$5; print t, i}' /proc/stat; }
@@ -70,6 +71,13 @@ if command -v smartctl >/dev/null; then
   else
     pub depto/nodo/nvme_smart "ON"
   fi
+fi
+
+# --- Antigüedad del último backup off-site (horas) desde el marker local ---
+MARKER=/opt/home-automation/.last-backup-offsite
+if [ -f "$MARKER" ]; then
+  now=$(date +%s); m=$(date -d "$(cat "$MARKER")" +%s 2>/dev/null || stat -c %Y "$MARKER")
+  pub depto/nodo/last_backup_age "$(awk -v n="$now" -v m="$m" 'BEGIN{printf "%.1f",(n-m)/3600}')"
 fi
 
 echo "node-metrics OK: $(date -Is) cpu=${cpu} ram=${ram} disk=$(df -P / | tail -1 | awk '{print $5}')"

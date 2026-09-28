@@ -39,7 +39,8 @@ automation:
   - id: nodo_alerta
     alias: "Nodo: alerta de recursos"
     description: >-
-      Alerta accionable sobre la salud del host R2130 (disco, temperatura CPU, SMART del NVMe).
+      Alerta accionable sobre la salud del host R2130 (disco, temperatura CPU, SMART del NVMe,
+      antigüedad del backup off-site).
       Los triggers numéricos disparan una sola vez al cruzar el umbral (anti-spam); el 'for'
       evita picos transitorios.
     triggers:
@@ -57,6 +58,10 @@ automation:
         entity_id: binary_sensor.node_nvme_smart
         to: "on"
         id: smart
+      - trigger: numeric_state
+        entity_id: sensor.node_last_backup_age
+        above: 36
+        id: backup
     actions:
       - choose:
           - conditions:
@@ -75,6 +80,14 @@ automation:
                 data:
                   title: "🌡️ CPU caliente"
                   message: "La CPU del R2130 está a {{ states('sensor.node_temp_cpu') }}°C."
+          - conditions:
+              - condition: trigger
+                id: backup
+            sequence:
+              - action: notify.mobile_app_lucass_iphone
+                data:
+                  title: "🗄️ Backup off-site atrasado"
+                  message: "El último backup a R2 tiene {{ states('sensor.node_last_backup_age') }} h. Revisar restic/cron."
         default:
           - action: notify.mobile_app_lucass_iphone
             data:

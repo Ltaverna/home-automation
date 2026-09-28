@@ -36,3 +36,9 @@ __pycache__/
 
 # Credenciales del backup off-site (restic + R2)
 .restic-env
+
+# Marker de último backup off-site (runtime, no config)
+.last-backup-offsite
+
+# Token de API de Cloudflare (Access/MCP portal)
+.cloudflare-token
