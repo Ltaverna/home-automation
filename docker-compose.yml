@@ -51,7 +51,7 @@ services:
   face-recognizer:
     build: ./face-recognizer
     container_name: face-recognizer
-    profiles: ["face"]
+    profiles: ["experimental"]   # el loop de cámara NO arranca en la casa principal
     restart: unless-stopped
     devices:
       - /dev/video0:/dev/video0
