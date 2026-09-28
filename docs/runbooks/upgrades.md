@@ -6,7 +6,13 @@ un `docker compose pull`/recreate NO actualiza sin editar el repo.
 ## Versiones actuales (2026-09-28)
 - `ghcr.io/home-assistant/home-assistant:2026.9.3`
 - `cloudflare/cloudflared:2026.9.3`
-- `eclipse-mosquitto:2.1.2`
+- `eclipse-mosquitto:2` @ `sha256:38c0da4f…` (broker 2.1.2; la línea 2.1.x solo se publica como
+  `-alpine`, así que se pinnea por digest inmutable de la imagen Debian que corre).
+
+### Cómo bumpear mosquitto (pin por digest)
+El `:2` es un tag móvil; para actualizar de forma controlada: `docker pull eclipse-mosquitto:2`,
+mirar el nuevo digest con `docker image inspect eclipse-mosquitto:2 --format '{{index .RepoDigests 0}}'`,
+y pegar ese `@sha256:…` en `docker-compose.yml`.
 
 ## Proceso de upgrade (por servicio)
 1. Revisar el release notes de la nueva versión (breaking changes).

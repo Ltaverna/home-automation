@@ -2,7 +2,9 @@ name: home-automation
 
 services:
   mosquitto:
-    image: eclipse-mosquitto:2.1.2
+    # 2.1.x solo se publica como -alpine; el :2 (Debian) que corre es 2.1.2. Se pinnea por
+    # digest inmutable de esa imagen exacta (no cambia de base ni de versión).
+    image: eclipse-mosquitto:2@sha256:38c0da4f2ef84284d47b3b3eeea1cb3bdeabe81ee10caf0cd5c5ff61ee3ea408
     container_name: mosquitto
     restart: unless-stopped
     ports:
