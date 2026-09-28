@@ -1,6 +1,6 @@
 # Estado actual — inventario vivo
 
-> Actualizado: 2026-09-20. Actualizar este documento cuando se agregue/quite hardware,
+> Actualizado: 2026-09-28. Actualizar este documento cuando se agregue/quite hardware,
 > integraciones, scripts o automatizaciones.
 
 ## Hardware en producción
@@ -59,6 +59,7 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 - `sensor.ultima_cara` — último reconocido por la cámara (vía MQTT); atributos `similarity`, `visto`
 - `input_boolean.lucas_visto_camara` — señal blanda: Lucas visto por cámara (no cambia house_mode solo)
 - `binary_sensor.salud_face_embed` / `salud_mcp` / `salud_home_assistant` — salud de servicios (device_class problem; off=ok, on=problema)
+- `sensor.node_cpu` / `node_ram` / `node_temp_cpu` / `node_temp_nvme` / `node_disk` + `binary_sensor.node_nvme_smart` — métricas del host R2130 (device "Nodo R2130"), publicadas cada ~1 min por `scripts/node-metrics.sh` (cron root). La temp del Hailo-8 no se expone (no hay hwmon/hailortcli on-demand); se muestra la del NVMe
 - Scripts nuevos dormitorio: `tv_app_dormitorio` (param `app_id`), `flow_dormitorio`,
   `netflix_dormitorio`, `youtube_dormitorio`; `flow_canal_dormitorio` ahora abre Flow solo.
 - Gotcha operativo: tras un restart de HA, si el Samsung reporta estados raros
@@ -94,6 +95,12 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 |---|---|
 | `iniciar_paseo` | Apaga ambas TVs, arranca `timer.paseo` (30 min) y notifica; lo dispara `modo_paseo_inicio` |
 
+### Host (fuera de HA, por cron)
+
+| Script | Qué hace |
+|---|---|
+| `scripts/node-metrics.sh` | Cron root cada 1 min → `/var/log/node-metrics.log`. Publica métricas del host (CPU, RAM, temp CPU, temp NVMe, disco `/`, SMART NVMe) a MQTT Discovery (device "Nodo R2130"). PATH explícito porque `smartctl` vive en `/usr/sbin` (fuera del PATH de cron). Métricas del host (no de un contenedor sin privilegios), coherente con `healthmon` |
+
 ## Automatizaciones
 
 | ID | Función |
@@ -103,12 +110,13 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
 | `house_mode_salida` | not_home 5 min ⇒ AWAY + apagar TVs + notificación. Respeta CLEANING **y modo_paseo** (no dispara si estás paseando). Fase 2: sumar mmWave |
 | `house_mode_noche_provisional` | 23:30 en casa ⇒ NIGHT. Fase 2: presencia real en dormitorio |
 | `house_mode_manana` | 07:00 si NIGHT ⇒ HOME |
-| `webhook_flow_sala` / `_netflix_sala` / `_youtube_sala` | POST sin auth (IDs aleatorios = secreto) para Atajos iOS; solo alcanzables desde la tailnet |
 | `despertar_suave` | 08:30 L-V estando en casa → TV dormitorio en Flow canal 14 |
 | `modo_paseo_inicio` / `modo_paseo_fin` | Paseo del perro: apaga TVs + timer 30 min; suspende AWAY; se cierra por timer o al volver a home |
 | `aviso_tv_prendida_sin_nadie` / `aviso_tv_accion_apagar` | Estando AWAY con TV encendida 2 min → notif accionable (long-press muestra "Apagar"); `not modo_simulacion` |
 | `simulacion_toggle_tv_living` / `simulacion_apagar_a_las_23_30` | Modo simulación + AWAY, 19-23:30: togglea el LG al azar (50% cada 30 min); apaga a las 23:30 |
 | `face_reconocido` / `face_lucas_presencia` | Notif al reconocer (o cara desconocida); prende/apaga `lucas_visto_camara` (señal blanda) |
+| `salud_alerta` | Notif al iPhone cuando un servicio no-core cae/recupera (transición) |
+| `nodo_alerta` | Notif accionable de salud del host: disco `/` > 85% (5 min), temp CPU > 80 °C (2 min) o SMART del NVMe en falla |
 
 ## Control desde el iPhone
 
@@ -118,8 +126,9 @@ En Fase 3 el ESP32 IR le da a HA: power, volumen (el real del living), mute y
    para navegar el LG (perfil de YouTube, menús). 100% nativo Apple.
 3. **App HA → dashboard "Control remoto":** d-pad + dígitos + apps + volumen para ambas TVs;
    funciona también fuera de casa (Tailscale).
-4. **Atajos por webhook (plan C):** POST a `https://r2130.tail71f19f.ts.net/api/webhook/<id>`
-   (IDs en `automations.yaml`). Funciona fuera de casa con Tailscale activo.
+
+(Los webhooks para Atajos iOS se eliminaron el 2026-09-28: redundantes con HomeKit/MCP y sus
+IDs eran credenciales en git. El control por voz/remoto ya está cubierto por Siri + HomeKit + MCP.)
 
 ## Accesos y secretos (nada de esto está en git)
 

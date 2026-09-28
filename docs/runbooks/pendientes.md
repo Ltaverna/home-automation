@@ -10,8 +10,12 @@ Accionable sin la compra USA. Prioridad sugerida:
    guardada fuera del R2130. Credenciales en `.restic-env` (fuera de git).
 2. ~~Eliminar los webhooks~~ **HECHO 2026-09-28**: quitados de `packages/tv.yaml` (redundantes con
    HomeKit/MCP) y del entity registry. Sus IDs-credencial ya no están en git ni activos en HA.
-3. **Observabilidad de nodo**: extender `healthmon` / integración System Monitor con CPU, RAM,
-   temperatura, uso de NVMe, Hailo. Liviano (NO Prometheus/Grafana). Antes de sumar servicios pesados.
+3. ~~Observabilidad de nodo~~ **HECHO 2026-09-28**: `scripts/node-metrics.sh` (cron root cada 1 min)
+   publica CPU/RAM/temp CPU/temp NVMe/disco/SMART del host a MQTT Discovery (device "Nodo R2130",
+   entities `sensor.node_*` + `binary_sensor.node_nvme_smart`). Alerta `nodo_alerta` en
+   `packages/salud.yaml` (disco>85%, temp CPU>80°C, SMART falla) y tarjeta en la vista "Salud".
+   Liviano (sin Prometheus/Grafana). La temp del Hailo-8 no se expone (no hay hwmon/hailortcli
+   on-demand) → se sustituye por la del NVMe. **✅ Hardening pre-Fase 2 COMPLETO (3/3).**
 
 El resto del roadmap (Vision Fusion, Frigate person/dog, pose, dog classifier, CLIP, estado
 semántico + MCP de dominio) es el norte, pero depende de la compra USA (sensores/cámara).

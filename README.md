@@ -78,7 +78,8 @@ incluidos en los backups.
 ├── .restic-env(.example)     → credenciales R2 para el backup off-site (real fuera de git)
 ├── scripts/
 │   ├── backup.sh             → cron 04:30 → /opt/backups (tar local, 14 días)
-│   └── backup-offsite.sh     → cron 04:45 → Cloudflare R2 (restic cifrado, 7d/4w/6m)
+│   ├── backup-offsite.sh     → cron 04:45 → Cloudflare R2 (restic cifrado, 7d/4w/6m)
+│   └── node-metrics.sh       → cron root 1 min → métricas del host (CPU/RAM/temp/NVMe/SMART) a MQTT
 └── docs/
     ├── estado-actual.md      → INVENTARIO VIVO: qué hay hoy y cómo se usa
     ├── roadmap-evolucion-arquitectura.md → norte del proyecto (semantic home / edge AI)
@@ -140,7 +141,7 @@ La R2130 tiene deploy key **read-only**: nunca commitea, solo pullea.
 | MCP | `ha_mcp_tools` + Cloudflare Tunnel → controlar la casa desde Claude/ChatGPT | ✅ 2026-09-26 |
 | Face rec (PoC) | FaceEmbed en Hailo (SCRFD+ArcFace) → `sensor.ultima_cara` + señal blanda | ✅ 2026-09-27 |
 | Arquitectura | Observabilidad (healthmon) + modularización (packages) + parametrización (secrets/profiles/onboarding) | ✅ 2026-09-28 |
-| Hardening | Backup off-site cifrado (restic→R2) ✅ · webhooks eliminados ✅ · observabilidad de nodo ⏳ | 🔶 en curso |
+| Hardening | Backup off-site cifrado (restic→R2) ✅ · webhooks eliminados ✅ · observabilidad de nodo ✅ | ✅ 2026-09-28 |
 | 2 — Presencia | SLZB-06M + Zigbee2MQTT, sensor puerta, mmWave, llegada/salida reales | ⏳ espera compra USA |
 | 3 — Living | Shelly Dimmer (electricista), ESP32 IR → NAD + aire, Modo Cine | ⏳ |
 | 4 — Cámara + AI | HailoRT 4.21 + Frigate + Reolink, person/dog, modo CLEANING, face event-driven | ⏳ |
