@@ -15,8 +15,9 @@ homeassistant:
   unit_system: metric
   currency: ARS
   country: AR
-  # external_url = subdominio del túnel Cloudflare para el MCP (clientes en la nube)
-  external_url: "https://ha-mcp.neuralcore.dev"
+  # URL canónica de HA para clientes remotos = Tailscale (llega al login de HA, sin puerto).
+  # El MCP usa su propio server_url (ha-mcp.neuralcore.dev), NO el external_url de HA.
+  external_url: "https://r2130.tail71f19f.ts.net"
   internal_url: "http://192.168.1.17:8123"
   # Config modular por feature (cada archivo agrupa automations + scripts + helpers)
   packages: !include_dir_named packages/
