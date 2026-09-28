@@ -35,3 +35,48 @@ automation:
             data:
               title: "✅ Servicio recuperado"
               message: "{{ trigger.to_state.attributes.friendly_name }} volvió a responder."
+
+  - id: nodo_alerta
+    alias: "Nodo: alerta de recursos"
+    description: >-
+      Alerta accionable sobre la salud del host R2130 (disco, temperatura CPU, SMART del NVMe).
+      Los triggers numéricos disparan una sola vez al cruzar el umbral (anti-spam); el 'for'
+      evita picos transitorios.
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.node_disk
+        above: 85
+        for: { minutes: 5 }
+        id: disco
+      - trigger: numeric_state
+        entity_id: sensor.node_temp_cpu
+        above: 80
+        for: { minutes: 2 }
+        id: temp_cpu
+      - trigger: state
+        entity_id: binary_sensor.node_nvme_smart
+        to: "on"
+        id: smart
+    actions:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: disco
+            sequence:
+              - action: notify.mobile_app_lucass_iphone
+                data:
+                  title: "⚠️ Disco NVMe lleno"
+                  message: "El disco / del R2130 está al {{ states('sensor.node_disk') }}%."
+          - conditions:
+              - condition: trigger
+                id: temp_cpu
+            sequence:
+              - action: notify.mobile_app_lucass_iphone
+                data:
+                  title: "🌡️ CPU caliente"
+                  message: "La CPU del R2130 está a {{ states('sensor.node_temp_cpu') }}°C."
+        default:
+          - action: notify.mobile_app_lucass_iphone
+            data:
+              title: "💾 SMART del NVMe: FALLA"
+              message: "smartctl reporta un problema en el NVMe del R2130. Revisar urgente (backup off-site al día)."

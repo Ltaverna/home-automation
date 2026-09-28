@@ -371,8 +371,25 @@ views:
             name: FaceEmbed API
           - entity: binary_sensor.salud_mcp
             name: MCP (ha-mcp)
+      - type: entities
+        title: Nodo R2130
+        entities:
+          - entity: sensor.node_cpu
+            name: CPU
+          - entity: sensor.node_ram
+            name: RAM
+          - entity: sensor.node_temp_cpu
+            name: Temp CPU
+          - entity: sensor.node_temp_nvme
+            name: Temp NVMe
+          - entity: sensor.node_disk
+            name: Disco /
+          - entity: binary_sensor.node_nvme_smart
+            name: SMART NVMe
       - type: markdown
         content: >
           **OK** = servicio respondiendo · **Problema** = no responde.
           `face-recognizer` está pausado a propósito (no se monitorea). El core
           (HA/MQTT/Raspi/internet) lo cubre el watchdog externo de healthchecks.io.
+          El **Nodo R2130** se actualiza cada ~1 min (script en el host → MQTT);
+          la temperatura del Hailo-8 no se expone (se muestra la del NVMe).

@@ -4,6 +4,9 @@
 # en su lugar se publica la temperatura del NVMe (hwmon). El resto: CPU, RAM, temp CPU, disco, SMART.
 set -uo pipefail
 
+# cron trae un PATH mínimo (/usr/bin:/bin); smartctl vive en /usr/sbin y docker en /usr/bin.
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+
 ENV_FILE=/opt/home-automation/.env
 # shellcheck disable=SC1090
 set -a; source "$ENV_FILE"; set +a
