@@ -34,9 +34,13 @@ def check_faceembed():
 
 
 def check_mcp():
+    # El server ha_mcp_tools responde 404 en "/" (el MCP vive en /<secret_path>);
+    # eso es transporte vivo. Solo 5xx / timeout / conexión caída = DOWN.
     try:
-        requests.get(f"http://{NODE}:9584/", timeout=8)
-        return True, "ok"
+        r = requests.get(f"http://{NODE}:9584/", timeout=8)
+        if r.status_code >= 500:
+            return False, f"HTTP {r.status_code}"
+        return True, f"HTTP {r.status_code}"
     except Exception as e:
         return False, repr(e)[:80]
 
