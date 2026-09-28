@@ -62,11 +62,31 @@ contra Cloudflare Access (login OTP de Lucas).
 3. Adjuntar una **Access policy**: allow por email `lucas@bold-agro.ai` (login OTP).
 4. En los connectors de ChatGPT/Claude, cambiar la URL a `https://<sub>.neuralcore.dev/mcp`.
 
-### API (para scriptear)
-Endpoints reales (verificados): `POST /accounts/<acc>/access/ai-controls/mcp/servers` y
-`.../mcp/portals`. Requieren que el API token tenga permiso **AI Controls** (además de
-Access: Apps and Policies) — sin él dan 403. El schema de estos endpoints (beta) no está
-documentado públicamente; hoy la vía confiable es el dashboard.
+### API (verificado) y estado actual
+Endpoints reales: `POST /accounts/<acc>/access/ai-controls/mcp/{servers,portals}`. Requieren en el
+API token el permission group **"MCP Portals"** (no "AI Controls") además de Access: Apps and
+Policies — sin él dan 403. Schema descubierto por prueba (beta, sin doc pública):
+- **server**: `{id, name, hostname (URL completa), auth_type: oauth|bearer|unauthenticated}`
+- **portal**: `{id, name, hostname, servers:[{server_id, require_user_auth?}]}`
+
+**Ya creado por API (2026-09-28):**
+- MCP server `ha-mcp` → upstream `https://ha-mcp.neuralcore.dev<secret_path>`, auth `unauthenticated`
+  (el secret_path es la credencial). Las tools de HA **sincronizaron OK** (el portal alcanza el MCP).
+- Portal `ha-portal` (hostname `ha-portal.neuralcore.dev`) con el server adjunto, status `ready`.
+
+**Falta (mejor por dashboard, que cablea DNS + Access app + policy automáticamente):**
+1. Enrutar el hostname del portal (DNS) — el token no tiene DNS:Read/Edit y los hostnames de túnel
+   se manejan por cloudflared; el dashboard lo resuelve.
+2. Habilitar **Require user auth** + adjuntar Access policy (allow `lucas@bold-agro.ai`, login OTP).
+   La identidad del portal se enforcea con la Access application asociada (no hay campo de policy en
+   el objeto portal por API).
+3. En ChatGPT/Claude apuntar el connector a `https://ha-portal.neuralcore.dev/mcp` y testear.
+
+Hasta que exista el DNS, `ha-portal.neuralcore.dev` **no resuelve** → no hay endpoint expuesto.
+
+> **Rotar el secret_path**: durante el armado por API el secret_path apareció en un output. Rotarlo
+> con `regenerate_secrets` (options flow) invalida el valor viejo; después actualizar el `hostname`
+> del server `ha-mcp` en el portal con la URL nueva.
 
 - **Rollback**: borrar el portal/servidor en el dashboard → el MCP sigue accesible por el
   endpoint actual (secret_path). El endpoint viejo nunca se toca, así que no hay pérdida de acceso.
