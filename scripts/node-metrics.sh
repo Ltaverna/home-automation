@@ -17,7 +17,7 @@ pub() {  # pub <topic> <payload> [retain]
 
 discovery() {  # discovery <key> <name> <device_class|""> <unit|""> [binary_sensor]
   local key="$1" name="$2" dclass="$3" unit="$4" kind="${5:-sensor}"
-  local cfg="{\"name\":\"$name\",\"unique_id\":\"node_$key\",\"state_topic\":\"depto/nodo/$key\","
+  local cfg="{\"name\":\"$name\",\"unique_id\":\"node_$key\",\"object_id\":\"node_$key\",\"state_topic\":\"depto/nodo/$key\","
   cfg+="\"device\":{\"identifiers\":[\"r2130_node\"],\"name\":\"Nodo R2130\"}"
   [ -n "$dclass" ] && cfg+=",\"device_class\":\"$dclass\""
   [ -n "$unit" ] && cfg+=",\"unit_of_measurement\":\"$unit\""
