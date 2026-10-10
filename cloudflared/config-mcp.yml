@@ -9,4 +9,7 @@ ingress:
   # ha-mcp da OAuth/DCR + streamable HTTP → compatible con Claude.ai y ChatGPT.
   - hostname: ha-mcp.neuralcore.dev
     service: http://localhost:9584
+  # Landing comercial estática (contenedor nginx 'landing' en loopback).
+  - hostname: casa.neuralcore.dev
+    service: http://localhost:8088
   - service: http_status:404
