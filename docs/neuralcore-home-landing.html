@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuralCore Home — El cerebro privado de tu casa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080a0e;
+  --bg-2:#0b0e14;
+  --surface:#0f141c;
+  --surface-2:#131926;
+  --line:rgba(150,170,200,.12);
+  --line-strong:rgba(150,170,200,.22);
+  --fg:#e9edf4;
+  --fg-dim:#a3b0c4;
+  --fg-faint:#6b788c;
+  --signal:#35e7cf;
+  --signal-deep:#0f3d3a;
+  --lime:#c6f24e;
+  --amber:#f4c76a;
+  --radius:14px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --maxw:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--fg);
+  font-family:'Hanken Grotesk',system-ui,sans-serif;
+  font-size:17px;line-height:1.6;letter-spacing:-.011em;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+::selection{background:var(--signal);color:#04120f}
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#1d2534;border:3px solid var(--bg);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:#2a3547}
+html{scrollbar-color:#1d2534 var(--bg)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:4px}
+h1,h2,h3{font-family:'Syne',sans-serif;font-weight:600;letter-spacing:-.03em;line-height:1.04;text-wrap:balance}
+.mono{font-family:'JetBrains Mono',monospace;letter-spacing:-.02em;font-feature-settings:"tnum" 1}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+section{position:relative}
+.eyebrowless-note{display:none}
+
+/* ---------- NAV ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:60;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 28px;max-width:var(--maxw);margin:0 auto;
+  transition:background .4s var(--ease),border-color .4s var(--ease);
+  border-bottom:1px solid transparent;left:50%;transform:translateX(-50%);width:100%}
+nav.scrolled{background:rgba(8,10,14,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-family:'Syne';font-weight:600;letter-spacing:-.02em;font-size:16px}
+.brand .mark{width:26px;height:26px;flex:none}
+.brand small{color:var(--fg-faint);font-weight:500;letter-spacing:.14em;font-size:10.5px;text-transform:uppercase;margin-left:-4px}
+.nav-links{display:flex;gap:30px;align-items:center}
+.nav-links a{font-size:14.5px;color:var(--fg-dim);transition:color .2s}
+.nav-links a:hover{color:var(--fg)}
+.nav-cta{font-family:'Syne';font-weight:600;font-size:14px;color:var(--bg)!important;
+  background:var(--signal);padding:9px 17px;border-radius:9px;
+  box-shadow:0 4px 18px -6px rgba(53,231,207,.5);transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 26px -6px rgba(53,231,207,.6)}
+@media(max-width:820px){.nav-links{display:none}}
+
+/* ---------- HERO ---------- */
+.hero{padding:148px 0 90px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center}
+.hero-glow{position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(60% 55% at 78% 38%,rgba(53,231,207,.14),transparent 70%),
+             radial-gradient(40% 40% at 12% 90%,rgba(100,130,255,.07),transparent 70%)}
+.hero .wrap{position:relative;z-index:1}
+.tag{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;color:var(--fg-dim);
+  font-family:'JetBrains Mono';letter-spacing:.02em;
+  border:1px solid var(--line);background:rgba(255,255,255,.015);
+  padding:7px 14px;border-radius:999px;margin-bottom:26px}
+.tag .dot{width:7px;height:7px;border-radius:50%;background:var(--signal);
+  box-shadow:0 0 0 0 rgba(53,231,207,.6);animation:beat 2.6s var(--ease) infinite}
+@keyframes beat{0%,100%{box-shadow:0 0 0 0 rgba(53,231,207,.55)}50%{box-shadow:0 0 0 7px rgba(53,231,207,0)}}
+h1.hero-h{font-size:clamp(2.9rem,6.4vw,5.1rem);line-height:.98;margin-bottom:24px}
+h1.hero-h em{font-style:normal;color:var(--signal)}
+.hero-sub{font-size:clamp(1.05rem,1.5vw,1.22rem);color:var(--fg-dim);max-width:30ch;margin-bottom:34px;line-height:1.5}
+.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.btn{font-family:'Syne';font-weight:600;font-size:15.5px;padding:14px 24px;border-radius:11px;
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s}
+.btn-primary{background:var(--signal);color:#04120f;box-shadow:0 10px 34px -10px rgba(53,231,207,.55)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 42px -10px rgba(53,231,207,.7)}
+.btn-ghost{border:1px solid var(--line-strong);color:var(--fg)}
+.btn-ghost:hover{border-color:var(--signal);color:var(--signal);transform:translateY(-2px)}
+.chips{display:flex;gap:10px;margin-top:38px;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--fg-dim);
+  padding:9px 15px 9px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.012)}
+.chip svg{width:17px;height:17px;color:var(--signal);flex:none}
+
+/* node diagram */
+.diagram{position:relative;aspect-ratio:1/1;max-width:460px;margin-left:auto;width:100%}
+.diagram .substrate{position:absolute;inset:-8% ;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:34px 34px;opacity:.5;
+  -webkit-mask:radial-gradient(60% 60% at 50% 48%,#000,transparent 78%);mask:radial-gradient(60% 60% at 50% 48%,#000,transparent 78%)}
+.diagram svg{position:relative;width:100%;height:100%;overflow:visible}
+.node-label{font-family:'JetBrains Mono';font-size:11px;fill:var(--fg-dim);letter-spacing:.04em}
+.core-label{font-family:'Syne';font-weight:600;font-size:15px;fill:var(--fg)}
+
+/* ---------- SECTION SHELL ---------- */
+.band{padding:104px 0;border-top:1px solid var(--line)}
+.band.tint{background:linear-gradient(180deg,var(--bg-2),var(--bg))}
+.sec-head{max-width:40ch;margin-bottom:54px}
+.sec-head .lead{font-family:'JetBrains Mono';font-size:12.5px;color:var(--signal);letter-spacing:.05em;margin-bottom:16px;display:block}
+.sec-head h2{font-size:clamp(2rem,3.6vw,3.05rem);margin-bottom:18px}
+.sec-head p{color:var(--fg-dim);font-size:1.08rem;max-width:62ch}
+
+/* ---------- PROBLEM ---------- */
+.problem-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:60px;align-items:start}
+.problem-list{display:flex;flex-direction:column}
+.prob{padding:26px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:baseline}
+.prob:last-child{border-bottom:1px solid var(--line)}
+.prob .n{font-family:'JetBrains Mono';font-size:13px;color:var(--fg-faint)}
+.prob h3{font-size:1.32rem;margin-bottom:7px}
+.prob p{color:var(--fg-dim);font-size:1rem;max-width:56ch}
+.problem-aside{position:sticky;top:110px;border:1px solid var(--line);border-radius:var(--radius);
+  padding:30px;background:var(--surface);box-shadow:0 30px 60px -30px rgba(0,0,0,.7)}
+.problem-aside .big{font-family:'Syne';font-weight:600;font-size:1.5rem;line-height:1.2;margin-bottom:14px}
+.problem-aside .big b{color:var(--signal);font-weight:600}
+.problem-aside p{color:var(--fg-dim);font-size:.98rem}
+
+/* ---------- SOLUTION FLOW ---------- */
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:60px;
+  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.flow-stage{padding:34px 30px;position:relative}
+.flow-stage:not(:last-child){border-right:1px solid var(--line)}
+.flow-stage .ico{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;
+  background:var(--signal-deep);color:var(--signal);margin-bottom:20px;border:1px solid rgba(53,231,207,.25)}
+.flow-stage .ico svg{width:21px;height:21px}
+.flow-stage .st{font-family:'JetBrains Mono';font-size:11px;color:var(--fg-faint);letter-spacing:.08em;margin-bottom:9px}
+.flow-stage h3{font-size:1.28rem;margin-bottom:9px}
+.flow-stage p{color:var(--fg-dim);font-size:.97rem}
+.flow-stage .arrow{position:absolute;right:-11px;top:50%;transform:translateY(-50%);z-index:2;
+  width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--line-strong);
+  display:grid;place-items:center;color:var(--signal)}
+.flow-stage .arrow svg{width:12px;height:12px}
+.promises{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.promise{padding-left:18px;border-left:2px solid var(--signal)}
+.promise h4{font-family:'Syne';font-weight:600;font-size:1.12rem;margin-bottom:7px}
+.promise p{color:var(--fg-dim);font-size:.96rem}
+
+/* ---------- HOY (capabilities) ---------- */
+.hoy-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:46px;flex-wrap:wrap}
+.badge-live{font-family:'JetBrains Mono';font-size:12px;color:var(--signal);display:inline-flex;gap:9px;align-items:center;
+  border:1px solid rgba(53,231,207,.3);border-radius:999px;padding:8px 15px;background:rgba(53,231,207,.05)}
+.cap-table{border-top:1px solid var(--line)}
+.cap{display:grid;grid-template-columns:.9fr 1.1fr;gap:40px;padding:24px 0;border-bottom:1px solid var(--line);
+  transition:background .3s var(--ease)}
+.cap:hover{background:rgba(255,255,255,.015)}
+.cap .title{display:flex;align-items:center;gap:15px}
+.cap .title svg{width:22px;height:22px;color:var(--signal);flex:none}
+.cap .title span{font-family:'Syne';font-weight:600;font-size:1.14rem}
+.cap .desc{color:var(--fg-dim);font-size:1rem;align-self:center}
+.cap .desc .hl{color:var(--fg)}
+
+/* ---------- ESCENAS ---------- */
+.scenes{display:flex;flex-direction:column;gap:2px}
+.scene{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;padding:22px 26px;
+  border:1px solid var(--line);border-radius:12px;background:var(--surface);
+  transition:transform .35s var(--ease),border-color .35s var(--ease)}
+.scene:hover{transform:translateX(6px);border-color:var(--line-strong)}
+.scene .cmd{font-family:'JetBrains Mono';font-size:15px;color:var(--signal);white-space:nowrap;
+  background:var(--signal-deep);border:1px solid rgba(53,231,207,.22);padding:11px 16px;border-radius:9px}
+.scene .out{color:var(--fg-dim);font-size:1.02rem}
+.scene .out b{color:var(--fg);font-weight:500}
+@media(max-width:620px){.scene{grid-template-columns:1fr;gap:12px}.scene .cmd{justify-self:start}}
+
+/* ---------- DIFERENCIADORES ---------- */
+.diff-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:54px;align-items:center}
+.diff-statement{font-size:clamp(1.7rem,2.8vw,2.5rem);font-family:'Syne';font-weight:600;line-height:1.15;letter-spacing:-.03em}
+.diff-statement b{color:var(--signal);font-weight:600}
+.diff-list{display:flex;flex-direction:column;gap:4px}
+.diff-item{padding:20px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
+.diff-item:last-child{border-bottom:1px solid var(--line)}
+.diff-item .ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--signal);flex:none;border:1px solid var(--line)}
+.diff-item .ico svg{width:18px;height:18px}
+.diff-item h4{font-family:'Syne';font-weight:600;font-size:1.08rem;margin-bottom:5px}
+.diff-item p{color:var(--fg-dim);font-size:.95rem}
+
+/* ---------- ROADMAP ---------- */
+.rm{position:relative;margin-top:30px}
+.rm-line{position:absolute;left:0;right:0;top:19px;height:2px;background:var(--line)}
+.rm-line .fill{position:absolute;left:0;top:0;height:100%;width:12%;background:var(--signal);
+  box-shadow:0 0 14px rgba(53,231,207,.6);transform:scaleX(0);transform-origin:left;transition:transform 1.6s var(--ease)}
+.rm.in .rm-line .fill{transform:scaleX(1)}
+.rm-stages{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;position:relative}
+.rm-stage .dot{width:40px;height:40px;border-radius:50%;background:var(--bg);border:2px solid var(--line-strong);
+  display:grid;place-items:center;margin-bottom:22px;font-family:'JetBrains Mono';font-size:13px;color:var(--fg-faint);position:relative}
+.rm-stage.done .dot{border-color:var(--signal);background:var(--signal);color:#04120f;box-shadow:0 0 20px -2px rgba(53,231,207,.6)}
+.rm-stage .ph{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.06em;color:var(--fg-faint);margin-bottom:8px}
+.rm-stage.done .ph{color:var(--signal)}
+.rm-stage h4{font-family:'Syne';font-weight:600;font-size:1.05rem;margin-bottom:8px}
+.rm-stage p{color:var(--fg-dim);font-size:.9rem;line-height:1.45}
+.rm-stage .status{display:inline-block;margin-top:11px;font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.05em;
+  padding:3px 9px;border-radius:5px;border:1px solid var(--line);color:var(--fg-faint)}
+.rm-stage.done .status{color:var(--signal);border-color:rgba(53,231,207,.3);background:rgba(53,231,207,.06)}
+@media(max-width:860px){.rm-line{display:none}.rm-stages{grid-template-columns:1fr;gap:0}
+  .rm-stage{display:grid;grid-template-columns:auto 1fr;gap:20px;padding:22px 0;border-bottom:1px solid var(--line)}
+  .rm-stage .dot{margin-bottom:0}}
+
+/* ---------- PAQUETES ---------- */
+.pkg{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.pkg-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;align-items:center}
+.pkg-row:not(:last-child){border-bottom:1px solid var(--line)}
+.pkg-head{position:sticky;top:0;background:var(--surface-2);z-index:2}
+.pkg-head .cell{padding:24px 22px}
+.pkg-head .plan{font-family:'Syne';font-weight:600;font-size:1.15rem;text-align:center}
+.pkg-head .plan.ai{color:var(--signal)}
+.pkg-head .plan small{display:block;font-family:'JetBrains Mono';font-weight:400;font-size:10.5px;color:var(--fg-faint);letter-spacing:.06em;margin-top:5px;text-transform:uppercase}
+.pkg-row .cell{padding:17px 22px}
+.pkg-row .feat{color:var(--fg-dim);font-size:.98rem}
+.pkg-row .mark{text-align:center}
+.pkg-row .mark svg{width:19px;height:19px}
+.pkg-row .yes{color:var(--signal)}
+.pkg-row .no{color:#333c4a}
+.pkg-row .opt{font-family:'JetBrains Mono';font-size:11px;color:var(--amber)}
+.col-ai{background:rgba(53,231,207,.035)}
+@media(max-width:720px){.pkg{overflow-x:auto}.pkg-inner{min-width:620px}}
+
+/* ---------- NEGOCIO ---------- */
+.biz-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.biz{padding:34px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);position:relative;overflow:hidden}
+.biz .k{font-family:'JetBrains Mono';font-size:11.5px;color:var(--signal);letter-spacing:.06em;margin-bottom:16px}
+.biz h3{font-size:1.5rem;margin-bottom:12px}
+.biz p{color:var(--fg-dim);font-size:1rem}
+.biz-note{margin-top:28px;color:var(--fg-dim);font-size:.97rem;max-width:70ch;padding-left:18px;border-left:2px solid var(--signal)}
+
+/* ---------- MERCADO ---------- */
+.mkt{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.mkt-col{padding:32px 28px}
+.mkt-col:not(:last-child){border-right:1px solid var(--line)}
+.mkt-col h4{font-family:'Syne';font-weight:600;font-size:1.18rem;margin-bottom:10px}
+.mkt-col p{color:var(--fg-dim);font-size:.97rem}
+
+/* ---------- CTA ---------- */
+.cta{padding:120px 0;text-align:center;position:relative;overflow:hidden;border-top:1px solid var(--line)}
+.cta-glow{position:absolute;inset:0;background:radial-gradient(50% 70% at 50% 0%,rgba(53,231,207,.12),transparent 65%);pointer-events:none}
+.cta .wrap{position:relative}
+.cta h2{font-size:clamp(2.2rem,4.4vw,3.6rem);margin-bottom:20px}
+.cta h2 em{font-style:normal;color:var(--signal)}
+.cta>.wrap>p{color:var(--fg-dim);font-size:1.12rem;max-width:56ch;margin:0 auto 38px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:0 auto 46px;max-width:900px;text-align:left}
+.step{padding:22px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.step .num{font-family:'JetBrains Mono';font-size:12px;color:var(--signal);margin-bottom:12px}
+.step p{color:var(--fg-dim);font-size:.93rem}
+.cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+@media(max-width:760px){.steps{grid-template-columns:1fr 1fr}}
+
+/* ---------- FOOTER ---------- */
+footer{border-top:1px solid var(--line);padding:38px 0;color:var(--fg-faint);font-size:13.5px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+footer .mono{color:var(--fg-faint)}
+.disclaimer{max-width:var(--maxw);margin:0 auto;padding:0 28px 50px;color:var(--fg-faint);font-size:12.5px;line-height:1.6}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(18px);filter:blur(6px);transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease)}
+.rv.in{opacity:1;transform:none;filter:none}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none;filter:none}
+  html{scroll-behavior:auto}
+}
+
+@media(max-width:900px){
+  .hero-grid,.problem-grid,.diff-grid,.biz-grid{grid-template-columns:1fr;gap:40px}
+  .flow,.promises,.mkt{grid-template-columns:1fr}
+  .flow-stage:not(:last-child){border-right:0;border-bottom:1px solid var(--line)}
+  .flow-stage .arrow{display:none}
+  .mkt-col:not(:last-child){border-right:0;border-bottom:1px solid var(--line)}
+  .problem-aside{position:static}
+  .cap{grid-template-columns:1fr;gap:10px}
+  .diagram{max-width:380px;margin:0 auto}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a class="brand" href="#top">
+    <svg class="mark" viewBox="0 0 28 28" fill="none">
+      <rect x="1" y="1" width="26" height="26" rx="7" stroke="#35e7cf" stroke-width="1.5" opacity=".4"/>
+      <circle cx="14" cy="14" r="3.2" fill="#35e7cf"/>
+      <circle cx="14" cy="14" r="6.5" stroke="#35e7cf" stroke-width="1.3" opacity=".55"/>
+      <path d="M14 7.5V4M14 24v-3.5M7.5 14H4M24 14h-3.5" stroke="#35e7cf" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>
+    </svg>
+    NeuralCore <small>HOME</small>
+  </a>
+  <div class="nav-links">
+    <a href="#producto">Producto</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#paquetes">Paquetes</a>
+    <a href="#contacto">Contacto</a>
+    <a class="nav-cta" href="#contacto">Ver una demo</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="tag"><span class="dot"></span>Domótica local-first · IA en el borde</span>
+        <h1 class="hero-h">El cerebro<br><em>privado</em> de tu casa</h1>
+        <p class="hero-sub">Toda la inteligencia corre en un solo equipo, dentro de tu casa. Sin nube. Sin que tus datos salgan. Controlable por voz, por app y por un agente de IA.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#producto">Ver el producto</a>
+          <a class="btn btn-ghost" href="#contacto">Hablar con nosotros</a>
+        </div>
+        <div class="chips">
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Privado</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><circle cx="12" cy="20" r="1"/><path d="M3 4l18 18" opacity=".9"/></svg>Offline-first</span>
+          <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 0-4 4c-1.5.6-2.5 2-2.5 3.7S6.5 15 8 15.6V16a4 4 0 0 0 8 0v-.4c1.5-.6 2.5-2 2.5-3.9S17.5 8.6 16 8a4 4 0 0 0-4-4z"/><path d="M12 4v16"/></svg>Inteligente</span>
+        </div>
+      </div>
+      <div class="diagram" aria-hidden="true">
+        <div class="substrate"></div>
+        <svg viewBox="0 0 400 400">
+          <defs>
+            <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+            <radialGradient id="core" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#5ff4de"/><stop offset="60%" stop-color="#35e7cf"/><stop offset="100%" stop-color="#149e8c"/>
+            </radialGradient>
+          </defs>
+          <!-- links -->
+          <g stroke="#35e7cf" stroke-width="1.4" fill="none" opacity=".35">
+            <path id="l1" d="M70 90 C130 120 150 160 200 200"/>
+            <path id="l2" d="M70 310 C130 280 150 240 200 200"/>
+            <path d="M330 90 C270 120 250 160 200 200" opacity=".5"/>
+            <path d="M330 310 C270 280 250 240 200 200" opacity=".5"/>
+            <path d="M200 200 L200 200"/>
+          </g>
+          <!-- outer nodes -->
+          <g>
+            <circle cx="70" cy="90" r="7" fill="#0f141c" stroke="#35e7cf" stroke-width="1.6"/>
+            <text class="node-label" x="70" y="70" text-anchor="middle">cámara</text>
+            <circle cx="70" cy="310" r="7" fill="#0f141c" stroke="#35e7cf" stroke-width="1.6"/>
+            <text class="node-label" x="70" y="334" text-anchor="middle">sensores</text>
+            <circle cx="330" cy="90" r="7" fill="#0f141c" stroke="#35e7cf" stroke-width="1.6"/>
+            <text class="node-label" x="330" y="70" text-anchor="middle">voz · app</text>
+            <circle cx="330" cy="310" r="7" fill="#0f141c" stroke="#35e7cf" stroke-width="1.6"/>
+            <text class="node-label" x="330" y="334" text-anchor="middle">agente IA</text>
+          </g>
+          <!-- core -->
+          <circle cx="200" cy="200" r="46" fill="none" stroke="#35e7cf" stroke-width="1" opacity=".3"/>
+          <circle cx="200" cy="200" r="34" fill="url(#core)" filter="url(#soft)" opacity=".55"/>
+          <circle cx="200" cy="200" r="30" fill="#0b1a1a" stroke="#35e7cf" stroke-width="1.6"/>
+          <text class="core-label" x="200" y="196" text-anchor="middle">NÚCLEO</text>
+          <text class="node-label" x="200" y="212" text-anchor="middle" fill="#35e7cf">26 TOPS</text>
+          <!-- traveling signal -->
+          <circle r="4.5" fill="#c6f24e">
+            <animateMotion dur="2.4s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.4 0 0.2 1">
+              <mpath href="#l1"/>
+            </animateMotion>
+          </circle>
+          <circle r="4" fill="#35e7cf">
+            <animateMotion dur="2.9s" begin="0.6s" repeatCount="indefinite">
+              <mpath href="#l2"/>
+            </animateMotion>
+          </circle>
+        </svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PROBLEMA -->
+<section class="band tint" id="producto">
+  <div class="wrap">
+    <div class="problem-grid">
+      <div class="sec-head rv" style="margin-bottom:0">
+        <span class="lead">El problema</span>
+        <h2>La casa “inteligente” de hoy está rota</h2>
+        <p>La gente que puede pagar una buena casa no quiere otro gadget que la espíe y se cuelgue.</p>
+      </div>
+      <div>
+        <div class="problem-list rv">
+          <div class="prob"><span class="n">01</span><div><h3>Depende de la nube</h3><p>Se cae tu internet —o el servidor de un tercero— y tu casa se vuelve tonta. Luces, clima, cámaras: todo deja de responder.</p></div></div>
+          <div class="prob"><span class="n">02</span><div><h3>Te espía</h3><p>Los asistentes de Amazon y Google escuchan y mandan todo a la nube. En una casa, eso es tu vida entera en servidores ajenos.</p></div></div>
+          <div class="prob"><span class="n">03</span><div><h3>Está fragmentada</h3><p>Una app para la TV, otra para las luces, otra para la cámara. Nada se entiende entre sí.</p></div></div>
+          <div class="prob"><span class="n">04</span><div><h3>Es reactiva, no inteligente</h3><p>Responde a comandos sueltos, pero no entiende la casa: no sabe si hay alguien, si es el perro, si saliste.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUCION -->
+<section class="band">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="lead">La solución</span>
+      <h2>Un solo equipo. El cerebro de la casa.</h2>
+      <p>Del tamaño de un libro, con un acelerador de IA dedicado. Percibe, entiende y actúa — todo local.</p>
+    </div>
+    <div class="flow rv">
+      <div class="flow-stage">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></div>
+        <div class="st">01 · PERCEPCIÓN</div>
+        <h3>Percibe</h3>
+        <p>Cámara, sensores de presencia, puertas, presencia por celular — señales del mundo real.</p>
+        <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      </div>
+      <div class="flow-stage">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 0-4 4c-1.5.6-2.5 2-2.5 3.7S6.5 15 8 15.6V16a4 4 0 0 0 8 0v-.4c1.5-.6 2.5-2 2.5-3.9S17.5 8.6 16 8a4 4 0 0 0-4-4z"/><path d="M12 4v16"/></svg></div>
+        <div class="st">02 · ENTENDIMIENTO</div>
+        <h3>Entiende</h3>
+        <p>La IA en el borde arma un estado semántico: quién hay, dónde, el perro, la puerta, los sistemas.</p>
+        <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      </div>
+      <div class="flow-stage">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
+        <div class="st">03 · ACCIÓN</div>
+        <h3>Actúa</h3>
+        <p>Luces, TV, clima, seguridad. Por voz, por app o conversando con un agente de IA.</p>
+      </div>
+    </div>
+    <div class="promises rv">
+      <div class="promise"><h4>Privado de verdad</h4><p>La IA corre en tu casa. Nada se sube a la nube — ni caras, ni rutinas, ni quién entra.</p></div>
+      <div class="promise"><h4>Funciona sin internet</h4><p>La lógica crítica es local. Si se cae la red, la casa sigue andando.</p></div>
+      <div class="promise"><h4>Entiende el contexto</h4><p>No ejecuta comandos sueltos: actúa sobre lo que realmente pasa en la casa.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOY -->
+<section class="band tint">
+  <div class="wrap">
+    <div class="hoy-head rv">
+      <div class="sec-head" style="margin-bottom:0">
+        <span class="lead">Qué hace hoy</span>
+        <h2>No es una promesa. Está funcionando.</h2>
+      </div>
+      <span class="badge-live"><span class="dot" style="width:7px;height:7px;border-radius:50%;background:var(--signal);display:inline-block"></span>En producción en una casa real</span>
+    </div>
+    <div class="cap-table rv">
+      <div class="cap"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>Control unificado de TVs</span></div><div class="desc">Encendido, apps, canales y volumen de todas las TVs desde <span class="hl">un solo lugar</span> — por voz, app o un toque.</div></div>
+      <div class="cap"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10M8.5 6.5a5 5 0 1 0 7 0"/></svg><span>Voz nativa (Siri / Apple Home)</span></div><div class="desc">“Oye Siri, modo cine”. Sin hub extra, directo contra <span class="hl">la casa, no la nube</span>.</div></div>
+      <div class="cap"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8" opacity=".5"/><path d="M9 9l6 6M15 9l-6 6"/></svg><span>Control por agente de IA</span></div><div class="desc">Le hablás a Claude o ChatGPT y controla la casa. <span class="hl">Único en el mercado residencial.</span></div></div>
+      <div class="cap"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Modos de casa + presencia</span></div><div class="desc">HOME / AWAY / NOCHE / LIMPIEZA. Sabe cuándo <span class="hl">llegás o salís</span> y se adapta sola.</div></div>
+      <div class="cap"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M12 8v4M12 15h.01"/></svg><span>Seguridad + simulación de presencia</span></div><div class="desc">Modo anti-robo: simula que hay alguien prendiendo y apagando luces <span class="hl">cuando no estás</span>.</div></div>
+      <div class="cap"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="10" r="3"/><path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5"/><path d="M15 8l3-3 3 3M18 5v8"/></svg><span>Reconocimiento facial en el borde</span></div><div class="desc">Identifica personas con el acelerador Hailo — <span class="hl">sin mandar la cara a ninguna nube</span>.</div></div>
+      <div class="cap"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.2C8 5.2 7 7 7 9c0 1.5-2 1.8-2 3.5C5 15 7 16 9 16h6c2 0 4-1 4-3.5 0-1.7-2-2-2-3.5 0-2-1-3.8-3-3.8-1 0-1.5.8-2 .8s-1-.8-2-.8z"/></svg><span>Cuidado de la mascota</span></div><div class="desc">Modo paseo y lógica que <span class="hl">distingue al perro de una persona</span> (en evolución con visión).</div></div>
+      <div class="cap"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a8 3 0 0 0 16 0 8 3 0 0 0-16 0zM4 7v10a8 3 0 0 0 16 0V7M4 12a8 3 0 0 0 16 0"/></svg><span>Confiabilidad de grado industrial</span></div><div class="desc">Backups cifrados fuera del sitio, monitoreo con alertas y recuperación probada. <span class="hl">No es un hobby.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ESCENAS -->
+<section class="band">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="lead">Escenas de 30 segundos</span>
+      <h2>Un comando. La casa entera responde.</h2>
+    </div>
+    <div class="scenes rv">
+      <div class="scene"><span class="cmd">“Llegué”</span><p class="out">El auto entra al barrio → <b>portón, luces de entrada y clima</b> se preparan solos.</p></div>
+      <div class="scene"><span class="cmd">“Modo cine”</span><p class="out">TV en la app, <b>luces al 10%</b>, sonido al receiver, persianas abajo.</p></div>
+      <div class="scene"><span class="cmd">“Salí”</span><p class="out">Nadie en casa → <b>todo se apaga</b>, seguridad activa, simulación de presencia a la noche.</p></div>
+      <div class="scene"><span class="cmd">“¿Qué pasa en casa?”</span><p class="out">Desde el trabajo: <b>“Nadie en casa, el perro en el living, puerta cerrada, todo normal.”</b></p></div>
+      <div class="scene"><span class="cmd">“Buenas noches”</span><p class="out">Apaga todo, baja el clima, <b>arma la alarma suave</b> y deja la luz de pasillo tenue.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFERENCIADORES -->
+<section class="band tint">
+  <div class="wrap">
+    <div class="diff-grid">
+      <div class="diff-statement rv">Tu casa controlada por un <b>agente de IA</b>, con todo corriendo en una caja privada en tu placard. Eso <b>no lo ofrece</b> Amazon, Google ni Apple.</div>
+      <div class="diff-list rv">
+        <div class="diff-item"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><div><h4>Local-first por diseño</h4><p>Privacidad y resiliencia no son un extra: son la base de la arquitectura.</p></div></div>
+        <div class="diff-item"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><div><h4>IA en el borde, de verdad</h4><p>Un NPU dedicado (Hailo, 26 TOPS) para visión y reconocimiento local. No “IA” que es la nube de otro.</p></div></div>
+        <div class="diff-item"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16"/></svg></div><div><h4>Abierto, sin lock-in</h4><p>Estándares abiertos (Matter, Zigbee, MQTT). No un ecosistema cerrado que te secuestra.</p></div></div>
+        <div class="diff-item"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><h4>Replicable casa por casa</h4><p>Proceso de instalación documentado. Lo aprendido en la primera casa se repite.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="band" id="roadmap">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="lead">El plan</span>
+      <h2>De “prendé la TV” a “¿qué pasa en casa?”</h2>
+      <p>La misma arquitectura evoluciona en cinco fases. La base ya está en producción.</p>
+    </div>
+    <div class="rm rv">
+      <div class="rm-line"><div class="fill"></div></div>
+      <div class="rm-stages">
+        <div class="rm-stage done"><div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="ph">FASE 1</div><h4>Base</h4><p>Nodo + control de TVs + voz + modos + presencia + backups.</p><span class="status">Hecho</span></div>
+        <div class="rm-stage"><div class="dot">2</div><div class="ph">FASE 2</div><h4>Presencia física</h4><p>Sensores Zigbee (puerta, radar mmWave): “hay alguien” confiable.</p><span class="status">Próximo</span></div>
+        <div class="rm-stage"><div class="dot">3</div><div class="ph">FASE 3</div><h4>Visión</h4><p>Cámara + detección de persona/perro/paquete en el borde, por zonas.</p><span class="status">Planificado</span></div>
+        <div class="rm-stage"><div class="dot">4</div><div class="ph">FASE 4</div><h4>Hogar semántico</h4><p>Estado único de la casa que la IA entiende y consume.</p><span class="status">Planificado</span></div>
+        <div class="rm-stage"><div class="dot">5</div><div class="ph">FASE 5</div><h4>Hogar agéntico</h4><p>El asistente razona sobre el contexto: seguridad, confort, rutinas.</p><span class="status">Visión</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAQUETES -->
+<section class="band tint" id="paquetes">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="lead">Paquetes</span>
+      <h2>Elegí el nivel de inteligencia</h2>
+    </div>
+    <div class="pkg rv">
+      <div class="pkg-inner">
+      <div class="pkg-row pkg-head">
+        <div class="cell"></div>
+        <div class="cell plan">Essential</div>
+        <div class="cell plan">Plus</div>
+        <div class="cell plan ai col-ai">AI<small>Insignia</small></div>
+      </div>
+      <div class="pkg-row"><div class="cell feat">Nodo local privado</div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      <div class="pkg-row"><div class="cell feat">Control unificado (TVs, luces, clima)</div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      <div class="pkg-row"><div class="cell feat">Voz (Siri) + App + modos + presencia</div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      <div class="pkg-row"><div class="cell feat">Backups cifrados + monitoreo</div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      <div class="pkg-row"><div class="cell feat">Sensores de presencia física (puerta, mmWave)</div><div class="cell mark"><svg class="no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg></div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      <div class="pkg-row"><div class="cell feat">Seguridad + simulación de presencia</div><div class="cell mark"><svg class="no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg></div><div class="cell mark"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      <div class="pkg-row"><div class="cell feat">Cámara + visión en el borde (persona/perro)</div><div class="cell mark"><svg class="no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg></div><div class="cell mark"><svg class="no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      <div class="pkg-row"><div class="cell feat">Control por agente de IA (Claude / ChatGPT)</div><div class="cell mark"><svg class="no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg></div><div class="cell mark"><span class="opt">opcional</span></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      <div class="pkg-row"><div class="cell feat">Estado semántico del hogar</div><div class="cell mark"><svg class="no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg></div><div class="cell mark"><svg class="no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h12"/></svg></div><div class="cell mark col-ai"><svg class="yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div></div>
+      </div>
+    </div>
+    <p style="color:var(--fg-faint);font-size:.9rem;margin-top:16px;font-family:'JetBrains Mono'">Nombres y alcance de paquetes ajustables según el segmento objetivo.</p>
+  </div>
+</section>
+
+<!-- NEGOCIO -->
+<section class="band">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="lead">Modelo de negocio</span>
+      <h2>Dos fuentes de ingreso</h2>
+    </div>
+    <div class="biz-grid rv">
+      <div class="biz"><div class="k">INGRESO ÚNICO</div><h3>Instalación</h3><p>Hardware (el nodo + sensores/cámara según paquete) + puesta en marcha + onboarding de la casa. Margen sobre hardware y mano de obra.</p></div>
+      <div class="biz"><div class="k">INGRESO RECURRENTE</div><h3>Suscripción</h3><p>Soporte, actualizaciones, monitoreo remoto de salud, backups gestionados y acceso remoto seguro. El recurrente que hace el negocio escalable.</p></div>
+    </div>
+    <p class="biz-note rv">Un solo nodo de bajo consumo corre todo y la IA es local: <b style="color:var(--fg)">no hay costo de nube por casa</b>, así que el margen de la suscripción es alto.</p>
+  </div>
+</section>
+
+<!-- MERCADO -->
+<section class="band tint">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="lead">Mercado objetivo</span>
+      <h2>Para quién</h2>
+    </div>
+    <div class="mkt rv">
+      <div class="mkt-col"><h4>Residencial premium</h4><p>Casas y departamentos de alto valor donde la privacidad y la confiabilidad importan — y hay poder adquisitivo.</p></div>
+      <div class="mkt-col"><h4>Segunda vivienda</h4><p>Countries y casas de fin de semana: acceso remoto, seguridad y simulación de presencia muy valorados.</p></div>
+      <div class="mkt-col"><h4>Sensibles a la privacidad</h4><p>Directivos y perfiles públicos que no quieren micrófonos de Amazon o Google en su casa.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="contacto">
+  <div class="cta-glow"></div>
+  <div class="wrap">
+    <h2 class="rv">Primero hacemos tu casa <em>confiable</em>.<br>Después la hacemos inteligente.</h2>
+    <p class="rv">El producto ya existe y es demostrable hoy. Estos son los próximos pasos para llevarlo a tu casa — o a tu cartera de clientes.</p>
+    <div class="steps rv">
+      <div class="step"><div class="num">PASO 01</div><p>Definir el segmento inicial y ajustar paquetes y precios.</p></div>
+      <div class="step"><div class="num">PASO 02</div><p>Demo en vivo sobre la casa piloto actual — se muestra hoy.</p></div>
+      <div class="step"><div class="num">PASO 03</div><p>Cerrar la Fase 2 (presencia física) para la primera venta completa.</p></div>
+      <div class="step"><div class="num">PASO 04</div><p>Armar el kit de instalación estándar para replicar por casa.</p></div>
+    </div>
+    <div class="cta-actions rv">
+      <a class="btn btn-primary" href="mailto:lucas@bold-agro.ai?subject=NeuralCore%20Home%20—%20demo">Agendar una demo</a>
+      <a class="btn btn-ghost" href="#top">Volver arriba</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <svg class="mark" viewBox="0 0 28 28" fill="none"><rect x="1" y="1" width="26" height="26" rx="7" stroke="#35e7cf" stroke-width="1.5" opacity=".4"/><circle cx="14" cy="14" r="3.2" fill="#35e7cf"/><circle cx="14" cy="14" r="6.5" stroke="#35e7cf" stroke-width="1.3" opacity=".55"/></svg>
+      NeuralCore <small>HOME</small>
+    </a>
+    <span class="mono">neuralcore.dev · domótica local-first con IA</span>
+  </div>
+</footer>
+<p class="disclaimer">Todo lo descrito como “hecho” está en producción y es demostrable. El roadmap es ejecutable sobre la misma arquitectura — no requiere rehacer nada. Documento comercial, v1 · 2026. “NeuralCore Home” es un nombre de trabajo.</p>
+
+<script>
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>24),{passive:true});
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.14,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
